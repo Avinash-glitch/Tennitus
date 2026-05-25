@@ -15,7 +15,7 @@ final class AudioEventRecorder: ObservableObject {
     private var samples: [Float] = []
     private var sampleRate = 44_100.0
     private var timer: Timer?
-    private let maximumDurationSeconds = 30
+    private let maximumDurationSeconds = 120
 
     func start() async {
         guard !isRecording else { return }

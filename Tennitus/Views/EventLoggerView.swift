@@ -3,10 +3,10 @@ import SwiftUI
 struct EventLoggerView: View {
     private enum Step: Int, CaseIterable {
         case audio
-        case spectrum
         case distress
         case loudness
         case context
+        case spectrum
         case review
 
         var title: String {
@@ -142,6 +142,12 @@ struct EventLoggerView: View {
     ) -> some View {
         EventStepContainer(eyebrow: eyebrow, title: title, subtitle: subtitle) {
             VStack(spacing: 28) {
+                if recorder.isRecording {
+                    ActiveRecordingStrip(elapsedSeconds: recorder.elapsedSeconds, loudnessDBFS: recorder.loudnessDBFS) {
+                        finalizeRecording()
+                    }
+                }
+
                 Text("\(Int(value.wrappedValue.rounded()))")
                     .font(.system(size: 88, weight: .bold, design: .rounded))
                     .monospacedDigit()
@@ -165,9 +171,15 @@ struct EventLoggerView: View {
         EventStepContainer(
             eyebrow: "CONTEXT",
             title: "What was happening?",
-            subtitle: "Add the setting and likely triggers before recording the sound."
+            subtitle: recorder.isRecording ? "Keep recording while you describe what is happening." : "Add the setting and likely triggers for this sound."
         ) {
             VStack(alignment: .leading, spacing: 16) {
+                if recorder.isRecording {
+                    ActiveRecordingStrip(elapsedSeconds: recorder.elapsedSeconds, loudnessDBFS: recorder.loudnessDBFS) {
+                        finalizeRecording()
+                    }
+                }
+
                 TextField("e.g. cafe, train, headphones, quiet room", text: $context, axis: .vertical)
                     .lineLimit(2...4)
                     .textFieldStyle(EventTextFieldStyle())
@@ -230,9 +242,16 @@ struct EventLoggerView: View {
                 Button {
                     toggleRecording()
                 } label: {
-                    Label(recorder.isRecording ? "Stop and analyse" : recordingResult == nil ? "Start recording" : "Record again", systemImage: recorder.isRecording ? "stop.fill" : "mic.fill")
+                    Label(recorder.isRecording ? "Stop now and analyse" : recordingResult == nil ? "Start recording" : "Record again", systemImage: recorder.isRecording ? "stop.fill" : "mic.fill")
                 }
                 .buttonStyle(EventButtonStyle(primary: true))
+
+                if recorder.isRecording {
+                    Text("You can tap Next and keep recording while you complete the log.")
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(EventTheme.primary)
+                        .multilineTextAlignment(.center)
+                }
 
                 if !recorder.isRecording && recordingResult == nil {
                     Button {
@@ -326,9 +345,18 @@ struct EventLoggerView: View {
                     .background(.white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .colorScheme(.light)
                 } else {
-                    Text("Record audio first to see the spectrum.")
-                        .font(.subheadline)
-                        .foregroundStyle(EventTheme.warning)
+                    if recorder.isRecording {
+                        ActiveRecordingStrip(elapsedSeconds: recorder.elapsedSeconds, loudnessDBFS: recorder.loudnessDBFS) {
+                            finalizeRecording()
+                        }
+                        Text("Stop the recording to unlock spectrum review.")
+                            .font(.subheadline)
+                            .foregroundStyle(EventTheme.muted)
+                    } else {
+                        Text("Record audio first to see the spectrum.")
+                            .font(.subheadline)
+                            .foregroundStyle(EventTheme.warning)
+                    }
                 }
             }
         }
@@ -393,12 +421,19 @@ struct EventLoggerView: View {
             Button {
                 nextOrSave()
             } label: {
-                Label(step == .review ? "Save event" : "Next", systemImage: step == .review ? "square.and.arrow.down" : "chevron.right")
+                Label(primaryFooterTitle, systemImage: step == .review ? "square.and.arrow.down" : "chevron.right")
             }
             .buttonStyle(EventButtonStyle(primary: true))
-            .disabled(step == .audio && recordingResult == nil && !skippedAudio)
+            .disabled(step == .audio && recordingResult == nil && !skippedAudio && !recorder.isRecording)
         }
         .padding(20)
+    }
+
+    private var primaryFooterTitle: String {
+        if step == .review { return "Save event" }
+        if step == .audio && recorder.isRecording { return "Continue logging" }
+        if step == .context && recorder.isRecording { return "Stop and review spectrum" }
+        return "Next"
     }
 
     private var reviewAnalysis: AudioAnalysisSummary? {
@@ -417,13 +452,7 @@ struct EventLoggerView: View {
 
     private func toggleRecording() {
         if recorder.isRecording {
-            recordingResult = recorder.stopAndAnalyse()
-            selectedAnalysis = recordingResult?.analysis
-            refreshSpectrumSnapshots()
-            sourceDetections = []
-            selectedStartSeconds = 0
-            selectedEndSeconds = recordingResult?.durationSeconds ?? 0
-            skippedAudio = false
+            finalizeRecording()
         } else {
             recordingResult = nil
             selectedAnalysis = nil
@@ -446,14 +475,40 @@ struct EventLoggerView: View {
 
     private func nextOrSave() {
         if step == .review {
+            if recorder.isRecording {
+                finalizeRecording()
+            }
             saveEvent()
             return
         }
+
+        if step == .audio && recorder.isRecording {
+            step = .distress
+            return
+        }
+
+        if step == .context && recorder.isRecording {
+            finalizeRecording()
+            step = .spectrum
+            return
+        }
+
         guard let nextStep = Step(rawValue: step.rawValue + 1) else { return }
         step = nextStep
         if nextStep == .review {
             detectDescribedSource()
         }
+    }
+
+    private func finalizeRecording() {
+        guard recorder.isRecording else { return }
+        recordingResult = recorder.stopAndAnalyse()
+        selectedAnalysis = recordingResult?.analysis
+        refreshSpectrumSnapshots()
+        sourceDetections = []
+        selectedStartSeconds = 0
+        selectedEndSeconds = recordingResult?.durationSeconds ?? 0
+        skippedAudio = false
     }
 
     private func reanalyseSelectedSegment() {
@@ -721,6 +776,52 @@ private struct EventRecordingOrb: View {
                 .foregroundStyle(isRecording ? EventTheme.primary : EventTheme.muted)
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+private struct ActiveRecordingStrip: View {
+    var elapsedSeconds: Int
+    var loudnessDBFS: Double
+    var stop: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(EventTheme.warning.opacity(0.16))
+                    .frame(width: 34, height: 34)
+                Circle()
+                    .fill(EventTheme.warning)
+                    .frame(width: 10, height: 10)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Recording continues")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(EventTheme.text)
+                Text("\(elapsedSeconds)s · \(loudnessDBFS.formatted(.number.precision(.fractionLength(0)))) dBFS")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(EventTheme.muted)
+            }
+
+            Spacer()
+
+            Button(action: stop) {
+                Label("Stop", systemImage: "stop.fill")
+                    .labelStyle(.iconOnly)
+                    .font(.caption.weight(.bold))
+                    .frame(width: 34, height: 34)
+                    .background(EventTheme.surface2, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Stop recording and analyse")
+        }
+        .padding(12)
+        .background(EventTheme.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(EventTheme.primary.opacity(0.28), lineWidth: 1)
+        )
     }
 }
 

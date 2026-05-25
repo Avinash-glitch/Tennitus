@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var store: AppStore
     @StateObject private var healthReader = AppleHealthContextReader()
+    @StateObject private var referencePlayer = TinnitusReferenceSoundPlayer()
     @State private var showingDeleteConfirmation = false
     @State private var portableExportURL: URL?
     @State private var exportMessage: String?
@@ -33,6 +34,12 @@ struct SettingsView: View {
                             }
                         }
                         .pickerStyle(.menu)
+
+                        TinnitusSoundReferencePicker(
+                            selectedType: $store.profile.soundType,
+                            playingType: referencePlayer.playingType,
+                            onPlay: { referencePlayer.toggle($0) }
+                        )
 
                         Divider()
 
@@ -174,6 +181,9 @@ struct SettingsView: View {
         } message: {
             Text("This removes local profile, check-in, spike, lab event, and audiogram data from this device.")
         }
+        .onDisappear {
+            referencePlayer.stop()
+        }
     }
 
     private var savedToneSummary: String {
@@ -230,6 +240,88 @@ struct SettingsView: View {
     private func dbLabel(_ value: Double?) -> String {
         guard let value else { return "-- dB HL" }
         return "\(value.formatted(.number.precision(.fractionLength(0)))) dB HL"
+    }
+}
+
+private struct TinnitusSoundReferencePicker: View {
+    @Binding var selectedType: SoundType
+    let playingType: SoundType?
+    let onPlay: (SoundType) -> Void
+
+    private let columns = [
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Reference sounds")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(TennitusStyle.graphite)
+                    Text("Compare softly, then choose the closest match.")
+                        .font(.caption)
+                        .foregroundStyle(TennitusStyle.muted)
+                }
+                Spacer()
+            }
+
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+                ForEach(SoundType.allCases) { type in
+                    ReferenceSoundButton(
+                        type: type,
+                        isSelected: selectedType == type,
+                        isPlaying: playingType == type,
+                        select: { selectedType = type },
+                        play: { onPlay(type) }
+                    )
+                }
+            }
+        }
+        .padding(.top, 2)
+    }
+}
+
+private struct ReferenceSoundButton: View {
+    let type: SoundType
+    let isSelected: Bool
+    let isPlaying: Bool
+    let select: () -> Void
+    let play: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(action: select) {
+                Text(type.rawValue)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(isSelected ? TennitusStyle.primary : TennitusStyle.graphite)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+
+            Button(action: play) {
+                Image(systemName: isPlaying ? "stop.fill" : "speaker.wave.2.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(isPlaying ? TennitusStyle.warning : TennitusStyle.primary)
+                    .frame(width: 28, height: 28)
+                    .background(Circle().fill(TennitusStyle.primary.opacity(0.10)))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isPlaying ? "Stop \(type.rawValue) reference" : "Play \(type.rawValue) reference")
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(isSelected ? TennitusStyle.primary.opacity(0.10) : Color.white.opacity(0.55))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(isSelected ? TennitusStyle.primary.opacity(0.45) : TennitusStyle.border, lineWidth: 1)
+        )
     }
 }
 

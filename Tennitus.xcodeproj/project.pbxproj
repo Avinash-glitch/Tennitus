@@ -1,0 +1,527 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		100000000000000000000001 /* TennitusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000101 /* TennitusApp.swift */; };
+		100000000000000000000002 /* TinnitusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000102 /* TinnitusModels.swift */; };
+		100000000000000000000003 /* AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000103 /* AppStore.swift */; };
+		100000000000000000000004 /* InsightEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000104 /* InsightEngine.swift */; };
+		100000000000000000000005 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000105 /* ContentView.swift */; };
+		100000000000000000000006 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000106 /* TodayView.swift */; };
+		100000000000000000000007 /* TrendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000107 /* TrendsView.swift */; };
+		100000000000000000000008 /* SoundsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000108 /* SoundsView.swift */; };
+		100000000000000000000009 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000109 /* ReportsView.swift */; };
+		10000000000000000000000A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000010A /* SettingsView.swift */; };
+		10000000000000000000000B /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000010C /* SoundPlayer.swift */; };
+		10000000000000000000000C /* ReportRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000010D /* ReportRenderer.swift */; };
+		10000000000000000000000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000010E /* Assets.xcassets */; };
+		10000000000000000000000E /* LabModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000010F /* LabModels.swift */; };
+		10000000000000000000000F /* SpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000110 /* SpectrumAnalyzer.swift */; };
+		100000000000000000000010 /* TinnitusTonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000111 /* TinnitusTonePlayer.swift */; };
+		100000000000000000000011 /* AudioEventRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000112 /* AudioEventRecorder.swift */; };
+		100000000000000000000012 /* ComfortSessionAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000113 /* ComfortSessionAdvisor.swift */; };
+		100000000000000000000013 /* LabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000114 /* LabView.swift */; };
+		100000000000000000000014 /* RecordingPlaybackPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000115 /* RecordingPlaybackPlayer.swift */; };
+		100000000000000000000015 /* AudiogramModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000116 /* AudiogramModels.swift */; };
+		100000000000000000000016 /* AudiogramEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000117 /* AudiogramEngine.swift */; };
+		100000000000000000000017 /* AppleHealthAudiogramWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000118 /* AppleHealthAudiogramWriter.swift */; };
+		100000000000000000000018 /* AudiogramReportRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000119 /* AudiogramReportRenderer.swift */; };
+		100000000000000000000019 /* AudiogramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000011A /* AudiogramView.swift */; };
+		10000000000000000000001A /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000011C /* DesignSystem.swift */; };
+		10000000000000000000001B /* AudioVisualViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000011D /* AudioVisualViews.swift */; };
+		10000000000000000000001C /* NotchFilterProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000011E /* NotchFilterProcessor.swift */; };
+		10000000000000000000001D /* PortableDataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000011F /* PortableDataExportService.swift */; };
+		100000000000000000000020 /* AppleHealthContextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000122 /* AppleHealthContextReader.swift */; };
+		100000000000000000000021 /* TriggerWeightingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000123 /* TriggerWeightingEngine.swift */; };
+		100000000000000000000022 /* HealthAndTriggerViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000124 /* HealthAndTriggerViews.swift */; };
+		100000000000000000000023 /* EventLoggerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000125 /* EventLoggerView.swift */; };
+		100000000000000000000024 /* AudiogramTonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000126 /* AudiogramTonePlayer.swift */; };
+		100000000000000000000025 /* SoundSourceDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000127 /* SoundSourceDetectionService.swift */; };
+		100000000000000000000026 /* TinnitusSubtypeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000128 /* TinnitusSubtypeClassifier.swift */; };
+		100000000000000000000027 /* BackendComfortSessionAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000129 /* BackendComfortSessionAdvisor.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		100000000000000000000101 /* TennitusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TennitusApp.swift; sourceTree = "<group>"; };
+		100000000000000000000102 /* TinnitusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinnitusModels.swift; sourceTree = "<group>"; };
+		100000000000000000000103 /* AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStore.swift; sourceTree = "<group>"; };
+		100000000000000000000104 /* InsightEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightEngine.swift; sourceTree = "<group>"; };
+		100000000000000000000105 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		100000000000000000000106 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		100000000000000000000107 /* TrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsView.swift; sourceTree = "<group>"; };
+		100000000000000000000108 /* SoundsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundsView.swift; sourceTree = "<group>"; };
+		100000000000000000000109 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		10000000000000000000010A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		10000000000000000000010B /* Tennitus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tennitus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		10000000000000000000010C /* SoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
+		10000000000000000000010D /* ReportRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRenderer.swift; sourceTree = "<group>"; };
+		10000000000000000000010E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		10000000000000000000010F /* LabModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabModels.swift; sourceTree = "<group>"; };
+		100000000000000000000110 /* SpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumAnalyzer.swift; sourceTree = "<group>"; };
+		100000000000000000000111 /* TinnitusTonePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinnitusTonePlayer.swift; sourceTree = "<group>"; };
+		100000000000000000000112 /* AudioEventRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioEventRecorder.swift; sourceTree = "<group>"; };
+		100000000000000000000113 /* ComfortSessionAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComfortSessionAdvisor.swift; sourceTree = "<group>"; };
+		100000000000000000000114 /* LabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabView.swift; sourceTree = "<group>"; };
+		100000000000000000000115 /* RecordingPlaybackPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPlaybackPlayer.swift; sourceTree = "<group>"; };
+		100000000000000000000116 /* AudiogramModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiogramModels.swift; sourceTree = "<group>"; };
+		100000000000000000000117 /* AudiogramEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiogramEngine.swift; sourceTree = "<group>"; };
+		100000000000000000000118 /* AppleHealthAudiogramWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthAudiogramWriter.swift; sourceTree = "<group>"; };
+		100000000000000000000119 /* AudiogramReportRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiogramReportRenderer.swift; sourceTree = "<group>"; };
+		10000000000000000000011A /* AudiogramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiogramView.swift; sourceTree = "<group>"; };
+		10000000000000000000011B /* Tennitus.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Tennitus.entitlements; sourceTree = "<group>"; };
+		10000000000000000000011C /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		10000000000000000000011D /* AudioVisualViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioVisualViews.swift; sourceTree = "<group>"; };
+		10000000000000000000011E /* NotchFilterProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchFilterProcessor.swift; sourceTree = "<group>"; };
+		10000000000000000000011F /* PortableDataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortableDataExportService.swift; sourceTree = "<group>"; };
+		100000000000000000000122 /* AppleHealthContextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthContextReader.swift; sourceTree = "<group>"; };
+		100000000000000000000123 /* TriggerWeightingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerWeightingEngine.swift; sourceTree = "<group>"; };
+		100000000000000000000124 /* HealthAndTriggerViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAndTriggerViews.swift; sourceTree = "<group>"; };
+		100000000000000000000125 /* EventLoggerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLoggerView.swift; sourceTree = "<group>"; };
+		100000000000000000000126 /* AudiogramTonePlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudiogramTonePlayer.swift; sourceTree = "<group>"; };
+		100000000000000000000127 /* SoundSourceDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundSourceDetectionService.swift; sourceTree = "<group>"; };
+		100000000000000000000128 /* TinnitusSubtypeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinnitusSubtypeClassifier.swift; sourceTree = "<group>"; };
+		100000000000000000000129 /* BackendComfortSessionAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendComfortSessionAdvisor.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		100000000000000000000201 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		100000000000000000000301 = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000302 /* Tennitus */,
+				100000000000000000000307 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		100000000000000000000302 /* Tennitus */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000303 /* App */,
+				100000000000000000000304 /* Models */,
+				100000000000000000000305 /* Services */,
+				100000000000000000000306 /* Views */,
+				100000000000000000000308 /* Resources */,
+				10000000000000000000011B /* Tennitus.entitlements */,
+			);
+			path = Tennitus;
+			sourceTree = "<group>";
+		};
+		100000000000000000000303 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000101 /* TennitusApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		100000000000000000000304 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000102 /* TinnitusModels.swift */,
+				10000000000000000000010F /* LabModels.swift */,
+				100000000000000000000116 /* AudiogramModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		100000000000000000000305 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000103 /* AppStore.swift */,
+				100000000000000000000104 /* InsightEngine.swift */,
+				10000000000000000000010C /* SoundPlayer.swift */,
+				10000000000000000000010D /* ReportRenderer.swift */,
+				100000000000000000000110 /* SpectrumAnalyzer.swift */,
+				100000000000000000000111 /* TinnitusTonePlayer.swift */,
+				100000000000000000000112 /* AudioEventRecorder.swift */,
+				100000000000000000000113 /* ComfortSessionAdvisor.swift */,
+				100000000000000000000115 /* RecordingPlaybackPlayer.swift */,
+				100000000000000000000117 /* AudiogramEngine.swift */,
+				100000000000000000000118 /* AppleHealthAudiogramWriter.swift */,
+				100000000000000000000119 /* AudiogramReportRenderer.swift */,
+				100000000000000000000126 /* AudiogramTonePlayer.swift */,
+				10000000000000000000011E /* NotchFilterProcessor.swift */,
+				10000000000000000000011F /* PortableDataExportService.swift */,
+				100000000000000000000122 /* AppleHealthContextReader.swift */,
+				100000000000000000000123 /* TriggerWeightingEngine.swift */,
+				100000000000000000000127 /* SoundSourceDetectionService.swift */,
+				100000000000000000000128 /* TinnitusSubtypeClassifier.swift */,
+				100000000000000000000129 /* BackendComfortSessionAdvisor.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		100000000000000000000306 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000105 /* ContentView.swift */,
+				100000000000000000000106 /* TodayView.swift */,
+				100000000000000000000107 /* TrendsView.swift */,
+				100000000000000000000108 /* SoundsView.swift */,
+				100000000000000000000109 /* ReportsView.swift */,
+				10000000000000000000010A /* SettingsView.swift */,
+				10000000000000000000011C /* DesignSystem.swift */,
+				10000000000000000000011D /* AudioVisualViews.swift */,
+				100000000000000000000124 /* HealthAndTriggerViews.swift */,
+				100000000000000000000125 /* EventLoggerView.swift */,
+				100000000000000000000114 /* LabView.swift */,
+				10000000000000000000011A /* AudiogramView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		100000000000000000000307 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10000000000000000000010B /* Tennitus.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		100000000000000000000308 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				10000000000000000000010E /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		100000000000000000000401 /* Tennitus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 100000000000000000000801 /* Build configuration list for PBXNativeTarget "Tennitus" */;
+			buildPhases = (
+				100000000000000000000601 /* Sources */,
+				100000000000000000000201 /* Frameworks */,
+				100000000000000000000602 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Tennitus;
+			productName = Tennitus;
+			productReference = 10000000000000000000010B /* Tennitus.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		100000000000000000000501 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					100000000000000000000401 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 100000000000000000000802 /* Build configuration list for PBXProject "Tennitus" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 100000000000000000000301;
+			productRefGroup = 100000000000000000000307 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				100000000000000000000401 /* Tennitus */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		100000000000000000000602 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10000000000000000000000D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		100000000000000000000601 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000001 /* TennitusApp.swift in Sources */,
+				100000000000000000000002 /* TinnitusModels.swift in Sources */,
+				100000000000000000000003 /* AppStore.swift in Sources */,
+				100000000000000000000004 /* InsightEngine.swift in Sources */,
+				100000000000000000000005 /* ContentView.swift in Sources */,
+				100000000000000000000006 /* TodayView.swift in Sources */,
+				100000000000000000000007 /* TrendsView.swift in Sources */,
+				100000000000000000000008 /* SoundsView.swift in Sources */,
+				100000000000000000000009 /* ReportsView.swift in Sources */,
+				10000000000000000000000A /* SettingsView.swift in Sources */,
+				10000000000000000000000B /* SoundPlayer.swift in Sources */,
+				10000000000000000000000C /* ReportRenderer.swift in Sources */,
+				10000000000000000000000E /* LabModels.swift in Sources */,
+				10000000000000000000000F /* SpectrumAnalyzer.swift in Sources */,
+				100000000000000000000010 /* TinnitusTonePlayer.swift in Sources */,
+				100000000000000000000011 /* AudioEventRecorder.swift in Sources */,
+				100000000000000000000012 /* ComfortSessionAdvisor.swift in Sources */,
+				100000000000000000000013 /* LabView.swift in Sources */,
+				100000000000000000000014 /* RecordingPlaybackPlayer.swift in Sources */,
+				100000000000000000000015 /* AudiogramModels.swift in Sources */,
+				100000000000000000000016 /* AudiogramEngine.swift in Sources */,
+				100000000000000000000017 /* AppleHealthAudiogramWriter.swift in Sources */,
+				100000000000000000000018 /* AudiogramReportRenderer.swift in Sources */,
+				100000000000000000000019 /* AudiogramView.swift in Sources */,
+				10000000000000000000001A /* DesignSystem.swift in Sources */,
+				10000000000000000000001B /* AudioVisualViews.swift in Sources */,
+				10000000000000000000001C /* NotchFilterProcessor.swift in Sources */,
+				10000000000000000000001D /* PortableDataExportService.swift in Sources */,
+				100000000000000000000020 /* AppleHealthContextReader.swift in Sources */,
+				100000000000000000000021 /* TriggerWeightingEngine.swift in Sources */,
+				100000000000000000000022 /* HealthAndTriggerViews.swift in Sources */,
+				100000000000000000000023 /* EventLoggerView.swift in Sources */,
+				100000000000000000000024 /* AudiogramTonePlayer.swift in Sources */,
+				100000000000000000000025 /* SoundSourceDetectionService.swift in Sources */,
+				100000000000000000000026 /* TinnitusSubtypeClassifier.swift in Sources */,
+				100000000000000000000027 /* BackendComfortSessionAdvisor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		100000000000000000000701 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		100000000000000000000702 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		100000000000000000000703 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Tennitus/Tennitus.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = 533TNBFYQ3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Tennitus;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Tennitus can read sleep and hearing-test context only with your permission.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Tennitus can save indicative audiogram screening points to Apple Health with your permission.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Tennitus records short sound events so you can analyse frequency patterns that felt bothersome.";
+				INFOPLIST_KEY_TENNITUS_AI_PROXY_URL = "$(TENNITUS_AI_PROXY_URL)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.avinashkannan.tennitus;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TENNITUS_AI_PROXY_URL = "";
+			};
+			name = Debug;
+		};
+		100000000000000000000704 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Tennitus/Tennitus.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = 533TNBFYQ3;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Tennitus;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Tennitus can read sleep and hearing-test context only with your permission.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Tennitus can save indicative audiogram screening points to Apple Health with your permission.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Tennitus records short sound events so you can analyse frequency patterns that felt bothersome.";
+				INFOPLIST_KEY_TENNITUS_AI_PROXY_URL = "$(TENNITUS_AI_PROXY_URL)";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.avinashkannan.tennitus;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TENNITUS_AI_PROXY_URL = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		100000000000000000000801 /* Build configuration list for PBXNativeTarget "Tennitus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100000000000000000000703 /* Debug */,
+				100000000000000000000704 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		100000000000000000000802 /* Build configuration list for PBXProject "Tennitus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100000000000000000000701 /* Debug */,
+				100000000000000000000702 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 100000000000000000000501 /* Project object */;
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#fbfaf7"/>
+  <rect x="80" y="70" width="1240" height="760" rx="34" fill="#ffffff" stroke="#d9c7a5" stroke-width="3"/>
+  <text x="145" y="185" font-family="Avenir Next, Inter, Arial, sans-serif" font-size="76" font-weight="700" fill="#221b13">StoryPose</text>
+  <text x="145" y="245" font-family="Avenir Next, Inter, Arial, sans-serif" font-size="34" fill="#66533a">A creator tool for turning rough story ideas into visual pose references</text>
+  <g transform="translate(940 180)" stroke="#7b4d1d" stroke-width="18" stroke-linecap="round" fill="none">
+    <circle cx="95" cy="42" r="34" fill="#f4dec0" stroke="#7b4d1d"/>
+    <path d="M95 82v132"/>
+    <path d="M95 132l-80 58"/>
+    <path d="M95 132l88-44"/>
+    <path d="M95 214l-74 98"/>
+    <path d="M95 214l82 96"/>
+  </g>
+  <g font-family="Avenir Next, Inter, Arial, sans-serif" font-size="32" fill="#2f281e">
+    <text x="145" y="390">1. Start with a scene prompt: character, emotion, action, camera angle, and composition.</text>
+    <text x="145" y="470">2. Generate pose boards for illustrators, animators, thumbnails, comics, and short-form video.</text>
+    <text x="145" y="550">3. Keep the workflow practical: fast references first, polished image generation only when useful.</text>
+    <text x="145" y="630">4. Potential buyers: indie creators, storyboard artists, comic makers, and content teams.</text>
+  </g>
+  <rect x="145" y="705" width="1110" height="58" rx="18" fill="#f7ecd9"/>
+  <text x="180" y="744" font-family="Avenir Next, Inter, Arial, sans-serif" font-size="26" fill="#7b4d1d">MVP: prompt-to-pose reference sheets with reusable character/style presets.</text>
+</svg>

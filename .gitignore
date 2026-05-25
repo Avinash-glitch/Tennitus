@@ -1,0 +1,17 @@
+.DS_Store
+._*
+**/._*
+.env
+Tennitus/Services/OpenAISecrets.generated.swift
+DerivedData/
+build/
+*.xcuserstate
+*.xcuserdata/
+xcuserdata/
+*.xcuserdatad/
+__pycache__/
+.venv/
+
+private/
+*.p8
+gemini-codebase-unification-fix-plan.md

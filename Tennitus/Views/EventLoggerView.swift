@@ -1,78 +1,49 @@
 import SwiftUI
 
 struct EventLoggerView: View {
-    private enum Step: Int, CaseIterable {
-        case audio
-        case distress
-        case loudness
-        case context
-        case spectrum
-        case review
-
-        var title: String {
-            switch self {
-            case .audio: "Record"
-            case .spectrum: "Spectrum"
-            case .distress: "Distress"
-            case .loudness: "Loudness"
-            case .context: "Context"
-            case .review: "Review"
-            }
-        }
-    }
-
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: AppStore
     @StateObject private var recorder = AudioEventRecorder()
 
-    @State private var step: Step = .audio
-    @State private var skippedAudio = false
-    @State private var distress = 5.0
-    @State private var loudness = 5.0
-    @State private var context = ""
-    @State private var notes = ""
+    @State private var distress = 3.0
+    @State private var loudness = 7.0
     @State private var triggerTags: Set<TriggerTag> = []
     @State private var recordingResult: AudioEventRecordingResult?
-    @State private var selectedStartSeconds = 0.0
-    @State private var selectedEndSeconds = 0.0
-    @State private var selectedAnalysis: AudioAnalysisSummary?
-    @State private var spectrumSnapshots: [SpectrumSnapshot] = []
-    @State private var selectedSnapshotID: UUID?
     @State private var sourceDetections: [SoundSourceDetection] = []
     @State private var isDetectingSource = false
     @State private var saveMessage: String?
     @State private var showingDiscardAlert = false
 
-    private var hasUnsavedData: Bool {
-        if recorder.isRecording { return true }
-        if recordingResult != nil { return true }
-        if distress != 5.0 || loudness != 5.0 { return true }
-        if !context.isEmpty || !notes.isEmpty { return true }
-        if !triggerTags.isEmpty { return true }
-        return false
-    }
-
-    private func handleDismiss() {
-        if hasUnsavedData {
-            showingDiscardAlert = true
-        } else {
-            dismiss()
-        }
-    }
-
     var body: some View {
         ZStack {
             EventTheme.background.ignoresSafeArea()
             VStack(spacing: 0) {
-                header
-                progress
-                currentStep
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                footer
+                ClinicalStatusBar(
+                    leftText: recorder.isRecording ? "● REC ACTIVE" : "● READY",
+                    rightText: recordingResult?.analysis.dominantFrequencyHz != nil ? formatHz(recordingResult!.analysis.dominantFrequencyHz) : "-- Hz",
+                    leftActive: recorder.isRecording
+                )
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        header
+                        spectrumHero
+                        subjectiveReadings
+                        contextTags
+                        saveButton
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                }
             }
         }
         .foregroundStyle(EventTheme.text)
         .preferredColorScheme(.dark)
+        .onAppear {
+            if !recorder.isRecording {
+                Task { await recorder.start() }
+            }
+        }
         .onDisappear {
             recorder.stop()
         }
@@ -88,141 +59,57 @@ struct EventLoggerView: View {
     }
 
     private var header: some View {
-        HStack {
-            Button {
-                handleDismiss()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.left")
-                    Text("Back")
-                }
-                .font(.headline)
-                .foregroundStyle(EventTheme.text)
-                .padding(.horizontal, 12)
-                .frame(height: 42)
-                .background(EventTheme.surface, in: Capsule())
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
-            Text("Log event")
-                .font(.headline)
-
-            Spacer()
-
-            Text("\(step.rawValue + 1)/\(Step.allCases.count)")
-                .font(.caption.monospacedDigit().weight(.semibold))
+        VStack(alignment: .leading, spacing: 8) {
+            Text("CAPTURE · LOG EVENT")
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .tracking(2.0)
                 .foregroundStyle(EventTheme.muted)
-                .frame(width: 42, height: 42)
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
-    }
-
-    private var progress: some View {
-        HStack(spacing: 6) {
-            ForEach(Step.allCases, id: \.rawValue) { item in
-                Capsule()
-                    .fill(item.rawValue <= step.rawValue ? EventTheme.primary : EventTheme.surface)
-                    .frame(height: 5)
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 12)
-    }
-
-    @ViewBuilder
-    private var currentStep: some View {
-        switch step {
-        case .audio:
-            audioStep
-        case .spectrum:
-            spectrumStep
-        case .distress:
-            scaleStep(
-                eyebrow: "DISTRESS",
-                title: "How distressing is it right now?",
-                subtitle: "This captures the emotional load of the event.",
-                value: $distress,
-                unit: "/ 10"
-            )
-        case .loudness:
-            scaleStep(
-                eyebrow: "LOUDNESS",
-                title: "How loud does it feel?",
-                subtitle: "This is your perceived tinnitus loudness, not microphone loudness.",
-                value: $loudness,
-                unit: "/ 10"
-            )
-        case .context:
-            contextStep
-        case .review:
-            reviewStep
+            Text("Analyze Ambient")
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .tracking(-0.5)
+            Text(recorder.isRecording ? "Capturing environment profile..." : "Audio captured.")
+                .font(.subheadline)
+                .foregroundStyle(EventTheme.muted)
         }
     }
 
-    private func scaleStep(
-        eyebrow: String,
-        title: String,
-        subtitle: String,
-        value: Binding<Double>,
-        unit: String
-    ) -> some View {
-        EventStepContainer(eyebrow: eyebrow, title: title, subtitle: subtitle) {
-            VStack(spacing: 28) {
-                if recorder.isRecording {
-                    ActiveRecordingStrip(elapsedSeconds: recorder.elapsedSeconds, loudnessDBFS: recorder.loudnessDBFS) {
-                        finalizeRecording()
+    private var spectrumHero: some View {
+        GlassPanel(padding: 20) {
+            VStack(spacing: 16) {
+                AnimatedSpectrumBars()
+
+                Divider().background(EventTheme.border)
+                    .padding(.vertical, 4)
+
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("AMBIENT PRESSURE")
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .tracking(1.5)
+                            .foregroundStyle(EventTheme.muted)
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text("\(recorder.loudnessDBFS.formatted(.number.precision(.fractionLength(1))))")
+                                .font(.system(size: 32, design: .monospaced))
+                            Text("dB")
+                                .font(.system(size: 14))
+                                .foregroundStyle(EventTheme.muted)
+                        }
                     }
-                }
 
-                RotaryDialControl(
-                    value: value,
-                    bounds: 0...10,
-                    step: 1.0,
-                    unit: unit,
-                    format: { val in "\(Int(val.rounded()))" }
-                )
-                .frame(maxWidth: .infinity)
-                .padding(.top, 40)
-            }
-        }
-    }
+                    Spacer()
 
-    private var contextStep: some View {
-        EventStepContainer(
-            eyebrow: "CONTEXT",
-            title: "What was happening?",
-            subtitle: recorder.isRecording ? "Keep recording while you describe what is happening." : "Add the setting and likely triggers for this sound."
-        ) {
-            VStack(alignment: .leading, spacing: 16) {
-                if recorder.isRecording {
-                    ActiveRecordingStrip(elapsedSeconds: recorder.elapsedSeconds, loudnessDBFS: recorder.loudnessDBFS) {
-                        finalizeRecording()
-                    }
-                }
-
-                TextField("e.g. cafe, train, headphones, quiet room", text: $context, axis: .vertical)
-                    .lineLimit(2...4)
-                    .textFieldStyle(EventTextFieldStyle())
-
-                TextField("Optional note", text: $notes, axis: .vertical)
-                    .lineLimit(2...4)
-                    .textFieldStyle(EventTextFieldStyle())
-
-                Text("Likely triggers")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(EventTheme.muted)
-
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 8)], alignment: .leading, spacing: 8) {
-                    ForEach(TriggerTag.allCases) { tag in
-                        EventPill(title: tag.rawValue, active: triggerTags.contains(tag)) {
-                            if triggerTags.contains(tag) {
-                                triggerTags.remove(tag)
-                            } else {
-                                triggerTags.insert(tag)
-                            }
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Text("PEAK FREQ")
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .tracking(1.5)
+                            .foregroundStyle(EventTheme.muted)
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(peakHzValueString)
+                                .font(.system(size: 20, design: .monospaced))
+                                .foregroundStyle(EventTheme.primary)
+                            Text("Hz")
+                                .font(.system(size: 12))
+                                .foregroundStyle(EventTheme.primary)
                         }
                     }
                 }
@@ -230,404 +117,119 @@ struct EventLoggerView: View {
         }
     }
 
-    private var audioStep: some View {
-        EventStepContainer(
-            eyebrow: "FIRST QUESTION",
-            title: recorder.isRecording ? "Recording environment" : "Record audio so the model can find clues?",
-            subtitle: "A short recording lets Tennitus analyse loudness, frequency bands, peaks, and sharp sounds. Raw audio stays local for this MVP."
-        ) {
-            VStack(spacing: 18) {
-                EventRecordingOrb(isRecording: recorder.isRecording, loudnessDBFS: recorder.loudnessDBFS)
+    private var peakHzValueString: String {
+        let hz = recordingResult?.analysis.dominantFrequencyHz ?? 0
+        if hz == 0 { return "--" }
+        return "\(Int(hz))"
+    }
 
-                if recorder.isRecording {
-                    Text("\(recorder.elapsedSeconds)s")
-                        .font(.title2.monospacedDigit().weight(.semibold))
-                } else if let recordingResult {
-                    Text("Recorded \(recordingResult.durationSeconds.formatted(.number.precision(.fractionLength(1))))s")
-                        .font(.headline)
-                } else {
-                    Text("Tap record when the event is happening.")
-                        .font(.subheadline)
+    private var subjectiveReadings: some View {
+        GlassPanel(padding: 20) {
+            VStack(spacing: 20) {
+                HStack {
+                    Text("SUBJECTIVE READINGS")
+                        .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        .tracking(1.5)
+                        .foregroundStyle(EventTheme.muted)
+                    Spacer()
+                    Text("DRAG · SCROLL")
+                        .font(.system(size: 10, design: .monospaced))
                         .foregroundStyle(EventTheme.muted)
                 }
 
-                if !recorder.recentSamples.isEmpty {
-                    EventWaveform(samples: recorder.recentSamples)
-                        .frame(height: 88)
-                }
-
-                if let error = recorder.lastError {
-                    Text(error)
-                        .font(.footnote)
-                        .foregroundStyle(EventTheme.warning)
-                }
-
-                Button {
-                    toggleRecording()
-                } label: {
-                    Label(recorder.isRecording ? "Stop now and analyse" : recordingResult == nil ? "Start recording" : "Record again", systemImage: recorder.isRecording ? "stop.fill" : "mic.fill")
-                }
-                .buttonStyle(EventButtonStyle(primary: true))
-
-                if recorder.isRecording {
-                    Text("You can tap Next and keep recording while you complete the log.")
-                        .font(.footnote.weight(.medium))
-                        .foregroundStyle(EventTheme.primary)
-                        .multilineTextAlignment(.center)
-                }
-
-                if !recorder.isRecording && recordingResult == nil {
-                    Button {
-                        skippedAudio = true
-                        step = .distress
-                    } label: {
-                        Label("Skip audio", systemImage: "forward.fill")
-                    }
-                    .buttonStyle(EventButtonStyle(primary: false))
+                HStack(spacing: 16) {
+                    RotaryDialControl(
+                        value: $loudness,
+                        bounds: 0...10,
+                        step: 1.0,
+                        unit: "Loudness",
+                        format: { val in "\(Int(val.rounded()))" },
+                        size: 130
+                    )
+                    
+                    RotaryDialControl(
+                        value: $distress,
+                        bounds: 0...10,
+                        step: 1.0,
+                        unit: "Distress",
+                        format: { val in "\(Int(val.rounded()))" },
+                        size: 130
+                    )
                 }
             }
         }
     }
 
-    private var spectrumStep: some View {
-        EventStepContainer(
-            eyebrow: "SPECTRUM",
-            title: "Mark the part that hurt",
-            subtitle: "Drag the range to analyse the exact sound, then use the peaks and spectrum as clues."
-        ) {
-            VStack(alignment: .leading, spacing: 16) {
-                if let recordingResult {
-                    WaveformSelectionView(
-                        samples: recordingResult.samples,
-                        selectedStart: selectedStartSeconds,
-                        selectedEnd: selectedEndSeconds,
-                        duration: recordingResult.durationSeconds,
-                        highlightedStart: selectedSnapshot?.startSeconds,
-                        highlightedEnd: selectedSnapshot.map { $0.startSeconds + $0.durationSeconds }
-                    )
-                    .frame(height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    private var contextTags: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("CONTEXT")
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .tracking(1.5)
+                .foregroundStyle(EventTheme.muted)
 
-                    VStack(spacing: 10) {
-                        EventRangeSlider(
-                            title: "Start",
-                            value: $selectedStartSeconds,
-                            range: 0...max(0.01, selectedEndSeconds - 0.1)
-                        )
-                        EventRangeSlider(
-                            title: "End",
-                            value: $selectedEndSeconds,
-                            range: min(recordingResult.durationSeconds, selectedStartSeconds + 0.1)...max(0.1, recordingResult.durationSeconds)
-                        )
-                    }
-
-                    Button {
-                        reanalyseSelectedSegment()
-                    } label: {
-                        Label("Analyse selected part", systemImage: "waveform.path.ecg")
-                    }
-                    .buttonStyle(EventButtonStyle(primary: true))
-
-                    let analysis = displayedSpectrumAnalysis(recordingResult: recordingResult)
-                    EventSpectrumSummary(
-                        title: selectedSnapshot == nil ? "Selection spectrum" : "Frame dB curve",
-                        analysis: analysis
-                    )
-
-                    if !spectrumSnapshots.isEmpty {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Text("STFT window")
-                                    .font(.headline)
-                                    .foregroundStyle(EventTheme.text)
-                                Spacer()
-                                Text(selectedSnapshotRangeLabel)
-                                    .font(.caption.monospacedDigit().weight(.semibold))
-                                    .foregroundStyle(EventTheme.muted)
-                            }
-                            Slider(
-                                value: spectrumSnapshotIndexBinding,
-                                in: 0...Double(max(0, spectrumSnapshots.count - 1)),
-                                step: 1
-                            )
-                            .tint(EventTheme.primary)
-                            SpectrogramHeatmapView(snapshots: spectrumSnapshots, selectedSnapshotID: $selectedSnapshotID)
-                                .colorScheme(.light)
+            let columns = [GridItem(.adaptive(minimum: 110), spacing: 8)]
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
+                ForEach(TriggerTag.allCases) { tag in
+                    EventPill(title: tag.rawValue, active: triggerTags.contains(tag)) {
+                        if triggerTags.contains(tag) {
+                            triggerTags.remove(tag)
+                        } else {
+                            triggerTags.insert(tag)
                         }
-                        .padding(14)
-                        .background(EventTheme.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    }
-
-                    SpectrumCurveView(
-                        analysis: analysis,
-                        tinnitusHz: store.profile.savedToneFrequencyHz,
-                        bothersomeHz: analysis.dominantFrequencyHz > 0 ? analysis.dominantFrequencyHz : nil,
-                        notchHz: nil
-                    )
-                    .padding(12)
-                    .background(.white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .colorScheme(.light)
-                } else {
-                    if recorder.isRecording {
-                        ActiveRecordingStrip(elapsedSeconds: recorder.elapsedSeconds, loudnessDBFS: recorder.loudnessDBFS) {
-                            finalizeRecording()
-                        }
-                        Text("Stop the recording to unlock spectrum review.")
-                            .font(.subheadline)
-                            .foregroundStyle(EventTheme.muted)
-                    } else {
-                        Text("Record audio first to see the spectrum.")
-                            .font(.subheadline)
-                            .foregroundStyle(EventTheme.warning)
                     }
                 }
             }
         }
     }
 
-    private var reviewStep: some View {
-        EventStepContainer(
-            eyebrow: "REVIEW",
-            title: "Save this event?",
-            subtitle: recordingResult == nil ? "This event will save your symptom ratings and context without audio clues." : "The event combines your answers with the recorded spectrum analysis."
-        ) {
-            VStack(alignment: .leading, spacing: 14) {
-                EventSummaryRow(label: "Distress", value: "\(Int(distress.rounded()))/10")
-                EventSummaryRow(label: "Loudness", value: "\(Int(loudness.rounded()))/10")
-                EventSummaryRow(label: "Context", value: context.isEmpty ? "Not added" : context)
-                EventSummaryRow(label: "Triggers", value: triggerTags.isEmpty ? "None selected" : triggerTags.map(\.rawValue).sorted().joined(separator: ", "))
-
-                if let analysis = reviewAnalysis {
-                    Divider().overlay(EventTheme.border)
-                    EventSummaryRow(label: "Peak frequency", value: formatHz(analysis.dominantFrequencyHz))
-                    if !analysis.topFrequencyPeaks.isEmpty {
-                        EventSummaryRow(label: "Top peaks", value: analysis.topFrequencyPeaks.prefix(3).map { formatHz($0.frequencyHz) }.joined(separator: ", "))
-                    }
-                    if let match = analysis.targetSoundMatches.first {
-                        EventTargetSoundCard(match: match, detections: analysis.sourceDetections, isDetectingSource: isDetectingSource)
-                    } else if !isDetectingSource && analysis.sourceDetections.isEmpty && !targetDescription.isEmpty {
-                        Text("No confident source label found; showing frequency clues instead.")
-                            .font(.footnote)
-                            .foregroundStyle(EventTheme.warning)
-                    }
-                    if isDetectingSource {
-                        EventSummaryRow(label: "Classifier", value: "Detecting source...")
-                    } else if !analysis.sourceDetections.isEmpty {
-                        EventSummaryRow(label: "Classifier labels", value: sourceDetectionSummary(analysis.sourceDetections))
-                    }
-                    EventSummaryRow(label: "Dominant band", value: analysis.dominantBandLabel)
-                    EventSummaryRow(label: "Sensitive range", value: analysis.sensitiveRangeLabel)
-                    EventSummaryRow(label: "Peak", value: "\(analysis.peakDBFS.formatted(.number.precision(.fractionLength(1)))) dBFS")
-                    TriggerScoreCard(score: TriggerWeightingEngine.calculate(store: store, analysis: analysis))
-                        .colorScheme(.light)
-                } else {
-                    Text("No audio recording attached. Audio clues like dominant band and sensitive range will be unavailable.")
-                        .font(.footnote)
-                        .foregroundStyle(skippedAudio ? EventTheme.muted : EventTheme.warning)
-                }
-
-                if let saveMessage {
-                    Text(saveMessage)
-                        .font(.footnote)
-                        .foregroundStyle(EventTheme.primary)
-                }
-            }
-        }
-    }
-
-    private var footer: some View {
-        HStack(spacing: 12) {
+    private var saveButton: some View {
+        VStack(spacing: 12) {
             Button {
-                previous()
+                saveEvent()
             } label: {
-                Label("Back", systemImage: "chevron.left")
+                Text("SAVE DATA ENTRY")
+                    .font(.system(size: 14, weight: .semibold))
+                    .tracking(1.0)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(TennitusStyle.graphite, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .foregroundStyle(EventTheme.background)
             }
-            .buttonStyle(EventButtonStyle(primary: false))
-            .disabled(step == .audio)
+            .buttonStyle(.plain)
 
-            Button {
-                nextOrSave()
-            } label: {
-                Label(primaryFooterTitle, systemImage: step == .review ? "square.and.arrow.down" : "chevron.right")
-            }
-            .buttonStyle(EventButtonStyle(primary: true))
-            .disabled(step == .audio && recordingResult == nil && !skippedAudio && !recorder.isRecording)
-        }
-        .padding(20)
-    }
-
-    private var primaryFooterTitle: String {
-        if step == .review { return "Save event" }
-        if step == .audio && recorder.isRecording { return "Continue logging" }
-        if step == .context && recorder.isRecording { return "Stop and review spectrum" }
-        return "Next"
-    }
-
-    private var reviewAnalysis: AudioAnalysisSummary? {
-        guard let recordingResult else { return nil }
-        let base = selectedAnalysis ?? recordingResult.analysis
-        let description = targetDescription
-        guard !description.isEmpty else { return base }
-        return SpectrumAnalyzer.analyzeTargeted(
-            samples: recordingResult.samples,
-            sampleRate: recordingResult.sampleRate,
-            startSeconds: selectedStartSeconds,
-            endSeconds: selectedEndSeconds,
-            description: description
-        ).withSourceDetections(sourceDetections)
-    }
-
-    private func toggleRecording() {
-        if recorder.isRecording {
-            finalizeRecording()
-        } else {
-            recordingResult = nil
-            selectedAnalysis = nil
-            spectrumSnapshots = []
-            selectedSnapshotID = nil
-            sourceDetections = []
-            selectedStartSeconds = 0
-            selectedEndSeconds = 0
-            skippedAudio = false
-            Task {
-                await recorder.start()
+            if let saveMessage {
+                Text(saveMessage)
+                    .font(.footnote)
+                    .foregroundStyle(EventTheme.primary)
             }
         }
+        .padding(.top, 8)
     }
 
-    private func previous() {
-        guard let previousStep = Step(rawValue: step.rawValue - 1) else { return }
-        step = previousStep
-    }
 
-    private func nextOrSave() {
-        if step == .review {
-            if recorder.isRecording {
-                finalizeRecording()
-            }
-            saveEvent()
-            return
-        }
-
-        if step == .audio && recorder.isRecording {
-            step = .distress
-            return
-        }
-
-        if step == .context && recorder.isRecording {
-            finalizeRecording()
-            step = .spectrum
-            return
-        }
-
-        guard let nextStep = Step(rawValue: step.rawValue + 1) else { return }
-        step = nextStep
-        if nextStep == .review {
-            detectDescribedSource()
-        }
-    }
-
-    private func finalizeRecording() {
-        guard recorder.isRecording else { return }
-        recordingResult = recorder.stopAndAnalyse()
-        selectedAnalysis = recordingResult?.analysis
-        refreshSpectrumSnapshots()
-        sourceDetections = []
-        selectedStartSeconds = 0
-        selectedEndSeconds = recordingResult?.durationSeconds ?? 0
-        skippedAudio = false
-    }
-
-    private func reanalyseSelectedSegment() {
-        guard let recordingResult else { return }
-        let start = max(0, min(selectedStartSeconds, recordingResult.durationSeconds))
-        let end = max(start + 0.05, min(selectedEndSeconds, recordingResult.durationSeconds))
-        selectedStartSeconds = start
-        selectedEndSeconds = end
-        selectedAnalysis = SpectrumAnalyzer.analyze(
-            samples: recordingResult.samples,
-            sampleRate: recordingResult.sampleRate,
-            startSeconds: start,
-            endSeconds: end
-        )
-        refreshSpectrumSnapshots()
-        sourceDetections = []
-        if !targetDescription.isEmpty {
-            detectDescribedSource()
-        }
-    }
-
-    private func refreshSpectrumSnapshots() {
-        guard let recordingResult else {
-            spectrumSnapshots = []
-            selectedSnapshotID = nil
-            return
-        }
-
-        let start = max(0, min(selectedStartSeconds, recordingResult.durationSeconds))
-        let end = max(start + 0.05, min(selectedEndSeconds > 0 ? selectedEndSeconds : recordingResult.durationSeconds, recordingResult.durationSeconds))
-        guard recordingResult.sampleRate > 0, end > start else {
-            spectrumSnapshots = []
-            selectedSnapshotID = nil
-            return
-        }
-
-        let lower = max(0, Int((start * recordingResult.sampleRate).rounded(.down)))
-        let upper = min(recordingResult.samples.count, Int((end * recordingResult.sampleRate).rounded(.up)))
-        guard upper - lower >= 512 else {
-            spectrumSnapshots = []
-            selectedSnapshotID = nil
-            return
-        }
-
-        spectrumSnapshots = SpectrumAnalyzer.stftSnapshots(
-            samples: Array(recordingResult.samples[lower..<upper]),
-            sampleRate: recordingResult.sampleRate,
-            windowSeconds: 0.5,
-            hopSeconds: 0.5,
-            startOffsetSeconds: start
-        )
-        selectedSnapshotID = spectrumSnapshots.first?.id
-    }
-
-    private func detectDescribedSource() {
-        guard !isDetectingSource, let url = recordingResult?.audioFileURL else { return }
-        let description = targetDescription
-        guard !description.isEmpty else { return }
-
-        isDetectingSource = true
-        Task {
-            let detections = await SoundSourceDetectionService.detect(audioFileURL: url, userDescription: description)
-            await MainActor.run {
-                sourceDetections = detections
-                isDetectingSource = false
-            }
-        }
-    }
 
     private func saveEvent() {
         let description = [
             "Distress: \(Int(distress.rounded()))/10",
             "Felt loudness: \(Int(loudness.rounded()))/10",
-            notes,
             triggerTags.isEmpty ? "" : "Triggers: \(triggerTags.map(\.rawValue).sorted().joined(separator: ", "))"
         ].filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
             .joined(separator: "\n")
 
         if let recordingResult {
-            let analysis = reviewAnalysis ?? selectedAnalysis ?? recordingResult.analysis
+            let analysis = recordingResult.analysis
             let suggestion = SpectrumAnalyzer.localSuggestion(
                 analysis: analysis,
                 tinnitusMatchHz: store.profile.savedToneFrequencyHz ?? 4_000,
-                description: "\(context) \(description)"
+                description: description
             )
 
             let event = AudioEventLog(
                 audioFilePath: recordingResult.audioFileURL?.path,
-                selectedStartSeconds: selectedStartSeconds,
-                selectedEndSeconds: selectedEndSeconds,
+                selectedStartSeconds: 0,
+                selectedEndSeconds: recordingResult.durationSeconds,
                 userDescription: description,
-                backgroundDescription: context,
+                backgroundDescription: "",
                 tinnitusMatchFrequencyHz: store.profile.savedToneFrequencyHz ?? 4_000,
                 analysis: analysis,
                 localSuggestion: suggestion,
@@ -639,20 +241,20 @@ struct EventLoggerView: View {
         let spike = SpikeLog(
             loudness: Int(loudness.rounded()),
             distress: Int(distress.rounded()),
-            context: context.isEmpty ? "Logged event" : context,
+            context: "Logged event",
             triggers: triggerTags,
-            notes: notes
+            notes: ""
         )
         store.save(spike)
 
-        saveMessage = (selectedAnalysis ?? recordingResult?.analysis).map { "Saved event with \($0.dominantBandLabel) dominant band." } ?? "Saved event without audio."
+        saveMessage = recordingResult != nil ? "Saved event with \(recordingResult!.analysis.dominantBandLabel) dominant band." : "Saved event without audio."
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             dismiss()
         }
     }
 
     private var targetDescription: String {
-        [context, notes, triggerTags.map(\.rawValue).sorted().joined(separator: " ")]
+        [triggerTags.map(\.rawValue).sorted().joined(separator: " ")]
             .joined(separator: " ")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -669,33 +271,9 @@ struct EventLoggerView: View {
         }.joined(separator: ", ")
     }
 
-    private func displayedSpectrumAnalysis(recordingResult: AudioEventRecordingResult) -> AudioAnalysisSummary {
-        selectedSnapshot?.analysis ?? selectedAnalysis ?? recordingResult.analysis
-    }
-
-    private var selectedSnapshot: SpectrumSnapshot? {
-        guard let selectedSnapshotID else { return spectrumSnapshots.first }
-        return spectrumSnapshots.first { $0.id == selectedSnapshotID } ?? spectrumSnapshots.first
-    }
-
-    private var selectedSnapshotRangeLabel: String {
-        guard let selectedSnapshot else { return "No window" }
-        return "\(selectedSnapshot.startSeconds.formatted(.number.precision(.fractionLength(1))))-\((selectedSnapshot.startSeconds + selectedSnapshot.durationSeconds).formatted(.number.precision(.fractionLength(1))))s"
-    }
-
-    private var selectedSnapshotIndex: Int {
-        guard let selectedSnapshotID else { return 0 }
-        return spectrumSnapshots.firstIndex { $0.id == selectedSnapshotID } ?? 0
-    }
-
-    private var spectrumSnapshotIndexBinding: Binding<Double> {
-        Binding(
-            get: { Double(selectedSnapshotIndex) },
-            set: { newValue in
-                let index = max(0, min(spectrumSnapshots.count - 1, Int(newValue.rounded())))
-                selectedSnapshotID = spectrumSnapshots.indices.contains(index) ? spectrumSnapshots[index].id : spectrumSnapshots.first?.id
-            }
-        )
+    private func finalizeRecording() {
+        guard recorder.isRecording else { return }
+        recordingResult = recorder.stopAndAnalyse()
     }
 }
 

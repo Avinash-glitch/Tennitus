@@ -125,6 +125,7 @@ struct RotaryDialControl: View {
     var step: Double = 1.0
     var unit: String
     var format: (Double) -> String
+    var size: CGFloat = 200
 
     @State private var dragStartValue: Double?
 
@@ -133,35 +134,35 @@ struct RotaryDialControl: View {
             ZStack {
                 Circle()
                     .fill(TennitusStyle.surfaceElevated)
-                    .frame(width: 200, height: 200)
-                    .shadow(color: .black.opacity(0.5), radius: 10, x: 0, y: 5)
+                    .frame(width: size, height: size)
+                    .shadow(color: .black.opacity(0.5), radius: size * 0.05, x: 0, y: size * 0.025)
 
                 Circle()
                     .stroke(TennitusStyle.border, lineWidth: 1)
-                    .frame(width: 200, height: 200)
+                    .frame(width: size, height: size)
 
                 // Tick marks
                 ForEach(0..<60) { i in
                     Rectangle()
                         .fill(i % 5 == 0 ? TennitusStyle.muted : TennitusStyle.border)
-                        .frame(width: 2, height: i % 5 == 0 ? 12 : 6)
-                        .offset(y: -90)
+                        .frame(width: 2, height: i % 5 == 0 ? size * 0.06 : size * 0.03)
+                        .offset(y: -size * 0.45)
                         .rotationEffect(.degrees(Double(i) * 6))
                 }
 
                 // Knob indicator based on current value relative to bounds
                 Circle()
                     .fill(TennitusStyle.accent)
-                    .frame(width: 12, height: 12)
-                    .offset(y: -75)
+                    .frame(width: size * 0.06, height: size * 0.06)
+                    .offset(y: -size * 0.375)
                     .rotationEffect(.degrees(rotationAngle))
 
                 VStack(spacing: 4) {
                     Text(format(value))
-                        .font(.system(size: 32, weight: .bold, design: .monospaced))
+                        .font(.system(size: size * 0.16, weight: .bold, design: .monospaced))
                         .foregroundStyle(TennitusStyle.primary)
                     Text(unit)
-                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .font(.system(size: size * 0.07, weight: .bold, design: .monospaced))
                         .foregroundStyle(TennitusStyle.muted)
                 }
             }

@@ -141,12 +141,13 @@ struct RotaryDialControl: View {
                     .stroke(TennitusStyle.border, lineWidth: 1)
                     .frame(width: size, height: size)
 
-                // Tick marks
+                // Tick marks (Clock style)
                 ForEach(0..<60) { i in
+                    let isMajor = i % 5 == 0
                     Rectangle()
-                        .fill(i % 5 == 0 ? TennitusStyle.muted : TennitusStyle.border)
-                        .frame(width: 2, height: i % 5 == 0 ? size * 0.06 : size * 0.03)
-                        .offset(y: -size * 0.45)
+                        .fill(isMajor ? TennitusStyle.muted : TennitusStyle.border)
+                        .frame(width: isMajor ? 3 : 1.5, height: isMajor ? size * 0.1 : size * 0.05)
+                        .offset(y: -size * 0.42)
                         .rotationEffect(.degrees(Double(i) * 6))
                 }
 
@@ -154,7 +155,7 @@ struct RotaryDialControl: View {
                 Circle()
                     .fill(TennitusStyle.accent)
                     .frame(width: size * 0.06, height: size * 0.06)
-                    .offset(y: -size * 0.375)
+                    .offset(y: -size * 0.32)
                     .rotationEffect(.degrees(rotationAngle))
 
                 VStack(spacing: 4) {
@@ -172,7 +173,8 @@ struct RotaryDialControl: View {
                         if dragStartValue == nil {
                             dragStartValue = value
                         }
-                        let delta = -Double(gesture.translation.height) / 5.0
+                        // Decreased sensitivity for finer control
+                        let delta = -Double(gesture.translation.height) / 25.0
                         setValue((dragStartValue ?? value) + delta * step)
                     }
                     .onEnded { _ in
@@ -218,7 +220,12 @@ struct RotaryDialControl: View {
     private func setValue(_ rawValue: Double) {
         let clamped = min(max(rawValue, bounds.lowerBound), bounds.upperBound)
         let stepped = bounds.lowerBound + ((clamped - bounds.lowerBound) / step).rounded() * step
-        value = min(max(stepped, bounds.lowerBound), bounds.upperBound)
+        let newValue = min(max(stepped, bounds.lowerBound), bounds.upperBound)
+        
+        if value != newValue {
+            value = newValue
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        }
     }
 
     private var rotationAngle: Double {

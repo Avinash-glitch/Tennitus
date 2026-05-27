@@ -41,6 +41,24 @@ struct EventLoggerView: View {
     @State private var sourceDetections: [SoundSourceDetection] = []
     @State private var isDetectingSource = false
     @State private var saveMessage: String?
+    @State private var showingDiscardAlert = false
+
+    private var hasUnsavedData: Bool {
+        if recorder.isRecording { return true }
+        if recordingResult != nil { return true }
+        if distress != 5.0 || loudness != 5.0 { return true }
+        if !context.isEmpty || !notes.isEmpty { return true }
+        if !triggerTags.isEmpty { return true }
+        return false
+    }
+
+    private func handleDismiss() {
+        if hasUnsavedData {
+            showingDiscardAlert = true
+        } else {
+            dismiss()
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -58,17 +76,31 @@ struct EventLoggerView: View {
         .onDisappear {
             recorder.stop()
         }
+        .alert("Discard log?", isPresented: $showingDiscardAlert) {
+            Button("Discard", role: .destructive) {
+                recorder.stop()
+                dismiss()
+            }
+            Button("Keep editing", role: .cancel) {}
+        } message: {
+            Text("This will stop recording and discard this unsaved event.")
+        }
     }
 
     private var header: some View {
         HStack {
             Button {
-                dismiss()
+                handleDismiss()
             } label: {
-                Image(systemName: "xmark")
-                    .font(.headline)
-                    .frame(width: 42, height: 42)
-                    .background(EventTheme.surface, in: Circle())
+                HStack(spacing: 4) {
+                    Image(systemName: "chevron.left")
+                    Text("Back")
+                }
+                .font(.headline)
+                .foregroundStyle(EventTheme.text)
+                .padding(.horizontal, 12)
+                .frame(height: 42)
+                .background(EventTheme.surface, in: Capsule())
             }
             .buttonStyle(.plain)
 
@@ -382,6 +414,10 @@ struct EventLoggerView: View {
                     }
                     if let match = analysis.targetSoundMatches.first {
                         EventTargetSoundCard(match: match, detections: analysis.sourceDetections, isDetectingSource: isDetectingSource)
+                    } else if !isDetectingSource && analysis.sourceDetections.isEmpty && !targetDescription.isEmpty {
+                        Text("No confident source label found; showing frequency clues instead.")
+                            .font(.footnote)
+                            .foregroundStyle(EventTheme.warning)
                     }
                     if isDetectingSource {
                         EventSummaryRow(label: "Classifier", value: "Detecting source...")
@@ -525,6 +561,9 @@ struct EventLoggerView: View {
         )
         refreshSpectrumSnapshots()
         sourceDetections = []
+        if !targetDescription.isEmpty {
+            detectDescribedSource()
+        }
     }
 
     private func refreshSpectrumSnapshots() {

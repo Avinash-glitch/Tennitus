@@ -6,6 +6,7 @@ struct TodayView: View {
     @State private var spikeDraft = SpikeLog()
     @State private var showingSpikeLog = false
     @State private var showingEventLogger = false
+    @State private var showingProfileEditor = false
 
     var body: some View {
         AppScreen {
@@ -23,10 +24,10 @@ struct TodayView: View {
                         ZStack {
                             Circle()
                                 .fill(TennitusStyle.primary)
-                                .frame(width: 132, height: 132)
-                                .shadow(color: TennitusStyle.primary.opacity(0.32), radius: 24, x: 0, y: 12)
+                                .frame(width: 88, height: 88)
+                                .shadow(color: TennitusStyle.primary.opacity(0.32), radius: 12, x: 0, y: 6)
                             Image(systemName: "mic.fill")
-                                .font(.system(size: 44, weight: .bold))
+                                .font(.system(size: 32, weight: .bold))
                                 .foregroundStyle(.white)
                         }
                         VStack(spacing: 4) {
@@ -41,10 +42,40 @@ struct TodayView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 26)
-                    .background(TennitusStyle.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: Color(red: 0.059, green: 0.118, blue: 0.157).opacity(0.12), radius: 24, x: 0, y: 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .stroke(
+                                LinearGradient(colors: [
+                                    .white.opacity(0.75),
+                                    TennitusStyle.primary.opacity(0.35),
+                                    TennitusStyle.accent.opacity(0.25)
+                                ], startPoint: .topLeading, endPoint: .bottomTrailing),
+                                lineWidth: 1
+                            )
+                    )
+                    .shadow(color: TennitusStyle.primary.opacity(0.18), radius: 22, x: 0, y: 14)
                 }
                 .buttonStyle(.plain)
+            }
+
+            AppSection {
+                HStack(alignment: .bottom) {
+                    Text("PATTERN PROFILE")
+                        .font(.system(size: 13, weight: .semibold, design: .default))
+                        .tracking(0.78)
+                        .foregroundStyle(TennitusStyle.muted)
+                        .padding(.horizontal, 6)
+                    Spacer()
+                    Button("Set Profile") {
+                        showingProfileEditor = true
+                    }
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(TennitusStyle.primary)
+                    .padding(.horizontal, 6)
+                }
+                TinnitusSubtypeCard(subtype: store.detectedSubtype)
+                SafetyNote(text: "This pattern profile is based on self-reported tracking data. It is not a clinical diagnosis or medical assessment.")
             }
 
             AppSection("Health context") {
@@ -53,11 +84,6 @@ struct TodayView: View {
 
             AppSection("Trigger weighting") {
                 TriggerScoreCard(score: TriggerWeightingEngine.calculate(store: store))
-            }
-
-            AppSection("Pattern Profile") {
-                TinnitusSubtypeCard(subtype: store.detectedSubtype)
-                SafetyNote(text: "This pattern profile is based on self-reported tracking data. It is not a clinical diagnosis or medical assessment.")
             }
 
             AppSection("Daily check-in") {
@@ -143,6 +169,11 @@ struct TodayView: View {
         .fullScreenCover(isPresented: $showingEventLogger) {
             EventLoggerView()
                 .environmentObject(store)
+        }
+        .sheet(isPresented: $showingProfileEditor) {
+            NavigationStack {
+                ProfileEditorView()
+            }
         }
         .onAppear {
             if let latest = store.latestCheckIn, Calendar.current.isDateInToday(latest.date) {

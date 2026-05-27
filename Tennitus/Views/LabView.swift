@@ -281,11 +281,13 @@ struct LabView: View {
                             .buttonStyle(AppButtonStyle(variant: tonePlayer.isPlaying ? .danger : .primary))
 
                             Button {
-                                saveToneMatchToProfile()
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    saveToneMatchToProfile()
+                                }
                             } label: {
                                 Label("Save Match", systemImage: "checkmark.circle.fill")
                             }
-                            .buttonStyle(AppButtonStyle(variant: .secondary))
+                            .buttonStyle(AppButtonStyle(variant: .primary))
                         }
 
                         if let toneSaveMessage {
@@ -339,6 +341,7 @@ struct LabView: View {
                                 } else {
                                     clearDraft(keepDescriptions: true)
                                     Task { await recorder.start() }
+                                    route = .review
                                 }
                             } label: {
                                 Image(systemName: recorder.isRecording ? "stop.fill" : "mic.fill")
@@ -389,12 +392,59 @@ struct LabView: View {
 
     private var reviewView: some View {
         Group {
-            BackHeader(parent: "Lab", title: "Review Event", actionTitle: "Clear", onBack: {
+            BackHeader(parent: "Lab", title: recorder.isRecording ? "Recording Event..." : "Review Event", actionTitle: "Clear", onBack: {
+                recorder.stop()
                 route = .home
             }, onAction: {
                 clearDraft()
                 route = .home
             })
+
+            if recorder.isRecording {
+                AppSection {
+                    AppCard(padding: 16) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Recording in progress")
+                                    .font(.headline)
+                                    .foregroundStyle(TennitusStyle.warning)
+                                Text("\(recorder.elapsedSeconds)s of 120s")
+                                    .font(.subheadline.monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button {
+                                stopAndAnalyse()
+                            } label: {
+                                Label("Stop", systemImage: "stop.circle.fill")
+                            }
+                            .buttonStyle(AppButtonStyle(variant: .danger))
+                        }
+                    }
+                }
+            }
+
+            AppSection("What bothered you") {
+                AppCard(padding: 16) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        FlowChipGrid(options: labelOptions, selected: $selectedLabels)
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Reaction intensity: \(Int(reactionIntensity))/10")
+                                .font(.subheadline)
+                            Slider(value: $reactionIntensity, in: 1...10, step: 1)
+                        }
+
+                        TextField("Describe the sound, e.g. brake squeal, fan whine, voice sibilance", text: $userDescription, axis: .vertical)
+                            .lineLimit(2...4)
+                            .textFieldStyle(.roundedBorder)
+
+                        TextField("Context, e.g. train, cafe, headphones, poor sleep", text: $backgroundDescription, axis: .vertical)
+                            .lineLimit(2...4)
+                            .textFieldStyle(.roundedBorder)
+                    }
+                }
+            }
 
             if let recordingResult, let latestAnalysis {
                 AppSection("Waveform") {
@@ -433,28 +483,6 @@ struct LabView: View {
                     }
                 }
 
-                AppSection("What bothered you") {
-                    AppCard(padding: 16) {
-                        VStack(alignment: .leading, spacing: 14) {
-                            FlowChipGrid(options: labelOptions, selected: $selectedLabels)
-
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Reaction intensity: \(Int(reactionIntensity))/10")
-                                    .font(.subheadline)
-                                Slider(value: $reactionIntensity, in: 1...10, step: 1)
-                            }
-
-                            TextField("Describe the sound, e.g. brake squeal, fan whine, voice sibilance", text: $userDescription, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.roundedBorder)
-
-                            TextField("Context, e.g. train, cafe, headphones, poor sleep", text: $backgroundDescription, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.roundedBorder)
-                        }
-                    }
-                }
-
                 AppSection("Analysis") {
                     AppCard(padding: 16) {
                         VStack(alignment: .leading, spacing: 14) {
@@ -472,7 +500,7 @@ struct LabView: View {
                         }
                     }
                 }
-            } else {
+            } else if !recorder.isRecording {
                 emptyLabState(
                     title: "No recording yet",
                     subtitle: "Start with Log Sound Event to capture audio before review.",

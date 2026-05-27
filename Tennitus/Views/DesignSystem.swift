@@ -158,6 +158,7 @@ struct AppButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(border, lineWidth: variant == .secondary ? 1 : 0)
             )
+            // Removed .contentShape(Rectangle()) to prevent accidental full-width edge taps
     }
 
     private var background: Color {

@@ -45,6 +45,7 @@
 		100000000000000000000026 /* TinnitusSubtypeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000128 /* TinnitusSubtypeClassifier.swift */; };
 		100000000000000000000027 /* BackendComfortSessionAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000129 /* BackendComfortSessionAdvisor.swift */; };
 		100000000000000000000028 /* TinnitusReferenceSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000012A /* TinnitusReferenceSoundPlayer.swift */; };
+		100000000000000000000029 /* AppleHealthHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000012B /* AppleHealthHistoryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +89,7 @@
 		100000000000000000000128 /* TinnitusSubtypeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinnitusSubtypeClassifier.swift; sourceTree = "<group>"; };
 		100000000000000000000129 /* BackendComfortSessionAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendComfortSessionAdvisor.swift; sourceTree = "<group>"; };
 		10000000000000000000012A /* TinnitusReferenceSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinnitusReferenceSoundPlayer.swift; sourceTree = "<group>"; };
+		10000000000000000000012B /* AppleHealthHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthHistoryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +185,7 @@
 				100000000000000000000125 /* EventLoggerView.swift */,
 				100000000000000000000114 /* LabView.swift */,
 				10000000000000000000011A /* AudiogramView.swift */,
+				10000000000000000000012B /* AppleHealthHistoryView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -309,6 +312,7 @@
 				100000000000000000000026 /* TinnitusSubtypeClassifier.swift in Sources */,
 				100000000000000000000027 /* BackendComfortSessionAdvisor.swift in Sources */,
 				100000000000000000000028 /* TinnitusReferenceSoundPlayer.swift in Sources */,
+				100000000000000000000029 /* AppleHealthHistoryView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,7 +441,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Tennitus/Tennitus.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = 533TNBFYQ3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Tennitus;
@@ -474,7 +478,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Tennitus/Tennitus.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 26;
 				DEVELOPMENT_TEAM = 533TNBFYQ3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Tennitus;

@@ -126,6 +126,15 @@ struct SettingsView: View {
                                 .foregroundStyle(TennitusStyle.muted)
                         }
 
+                        if !store.appleHealthContext.dataPoints.isEmpty {
+                            NavigationLink {
+                                AppleHealthHistoryView(dataPoints: store.appleHealthContext.dataPoints)
+                            } label: {
+                                Label("View full history", systemImage: "list.bullet.rectangle")
+                            }
+                            .buttonStyle(AppButtonStyle(variant: .secondary))
+                        }
+
                         if let healthMessage {
                             Text(healthMessage)
                                 .font(.footnote)
@@ -380,5 +389,87 @@ struct RedFlagScreeningView: View {
                 result = existing
             }
         }
+    }
+}
+
+struct ProfileEditorView: View {
+    @EnvironmentObject private var store: AppStore
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var referencePlayer = TinnitusReferenceSoundPlayer()
+
+    var body: some View {
+        AppScreen {
+            AppSection("Tinnitus profile") {
+                AppCard(padding: 16) {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Picker("Laterality", selection: $store.profile.laterality) {
+                            ForEach(TinnitusLaterality.allCases) { item in
+                                Text(item.rawValue).tag(item)
+                            }
+                        }
+                        .pickerStyle(.menu)
+
+                        Picker("Sound type", selection: $store.profile.soundType) {
+                            ForEach(SoundType.allCases) { item in
+                                Text(item.rawValue).tag(item)
+                            }
+                        }
+                        .pickerStyle(.menu)
+
+                        TinnitusSoundReferencePicker(
+                            selectedType: $store.profile.soundType,
+                            playingType: referencePlayer.playingType,
+                            onPlay: { referencePlayer.toggle($0) }
+                        )
+
+                        Divider()
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Saved tone match")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(TennitusStyle.graphite)
+                                Text(savedToneSummary)
+                                    .font(.caption)
+                                    .foregroundStyle(TennitusStyle.muted)
+                            }
+                            Spacer()
+                            Image(systemName: "waveform")
+                                .foregroundStyle(TennitusStyle.primary)
+                        }
+                    }
+                }
+            }
+
+            AppSection("Baseline") {
+                AppCard(padding: 16) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        SettingsScaleRow(title: "Loudness", value: $store.profile.baselineLoudness)
+                        SettingsScaleRow(title: "Distress", value: $store.profile.baselineDistress)
+                        SettingsScaleRow(title: "Sleep impact", value: $store.profile.sleepImpact)
+                    }
+                }
+            }
+        }
+        .navigationTitle("Set Profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Done") {
+                    dismiss()
+                }
+                .font(.body.weight(.semibold))
+            }
+        }
+        .onDisappear {
+            referencePlayer.stop()
+        }
+    }
+
+    private var savedToneSummary: String {
+        if let hz = store.profile.savedToneFrequencyHz, let wave = store.profile.savedToneWaveform {
+            return "\(Int(hz)) Hz (\(wave.rawValue.lowercased()))"
+        }
+        return "None saved"
     }
 }

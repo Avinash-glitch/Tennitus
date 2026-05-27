@@ -152,12 +152,40 @@ struct AIResponseLog: Identifiable, Codable, Equatable {
     var suggestion: ComfortSessionSuggestion
 }
 
+struct AppleHealthDataPoint: Identifiable, Codable, Equatable {
+    var id = UUID()
+    var kind: Kind
+    var startDate: Date
+    var endDate: Date?
+    var value: Double
+    var unit: String
+    var sourceName: String?
+    var metadata: [String: String] = [:]
+
+    enum Kind: String, Codable, CaseIterable {
+        case sleepSegment
+        case audiogramLeft
+        case audiogramRight
+    }
+}
+
 struct AppleHealthContext: Codable, Equatable {
     var lastSyncedAt: Date?
     var sleep: AppleSleepSummary?
     var hearing: AppleHearingSummary?
+    var dataPoints: [AppleHealthDataPoint] = []
 
     static let empty = AppleHealthContext()
+}
+
+extension AppleHealthContext {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        lastSyncedAt = try container.decodeIfPresent(Date.self, forKey: .lastSyncedAt)
+        sleep = try container.decodeIfPresent(AppleSleepSummary.self, forKey: .sleep)
+        hearing = try container.decodeIfPresent(AppleHearingSummary.self, forKey: .hearing)
+        dataPoints = try container.decodeIfPresent([AppleHealthDataPoint].self, forKey: .dataPoints) ?? []
+    }
 }
 
 struct AppleSleepSummary: Codable, Equatable {

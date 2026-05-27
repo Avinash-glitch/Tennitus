@@ -31,6 +31,9 @@ private final class SoundAnalysisDetector {
                         _ in continuation.resume(returning: observer.bestDetections())
                     }
                 } catch {
+                    #if DEBUG
+                    print("SoundSourceDetectionService error: \(error)")
+                    #endif
                     continuation.resume(returning: [])
                 }
             }

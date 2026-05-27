@@ -47,14 +47,15 @@ final class AppleHealthContextReader: ObservableObject {
 
     func syncContext(lookbackDays: Int = 14) async throws -> AppleHealthContext {
         try await requestAuthorization()
-        let sleep = try await fetchSleepSummary(lookbackDays: lookbackDays)
-        let hearing = try await fetchLatestAudiogramSummary()
-        let context = AppleHealthContext(lastSyncedAt: Date(), sleep: sleep, hearing: hearing)
+        var dataPoints: [AppleHealthDataPoint] = []
+        let sleep = try await fetchSleepSummary(lookbackDays: lookbackDays, outPoints: &dataPoints)
+        let hearing = try await fetchLatestAudiogramSummary(outPoints: &dataPoints)
+        let context = AppleHealthContext(lastSyncedAt: Date(), sleep: sleep, hearing: hearing, dataPoints: dataPoints)
         statusMessage = "Synced Apple Health sleep and hearing context"
         return context
     }
 
-    private func fetchSleepSummary(lookbackDays: Int) async throws -> AppleSleepSummary? {
+    private func fetchSleepSummary(lookbackDays: Int, outPoints: inout [AppleHealthDataPoint]) async throws -> AppleSleepSummary? {
         guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return nil }
         let calendar = Calendar.current
         let endDate = Date()
@@ -63,6 +64,28 @@ final class AppleHealthContextReader: ObservableObject {
         let samples = try await categorySamples(type: sleepType, predicate: predicate)
         let asleepSamples = samples.filter { isAsleepValue($0.value) }
         guard !asleepSamples.isEmpty else { return nil }
+
+        for sample in asleepSamples {
+            var metadata: [String: String] = [:]
+            if #available(iOS 16.0, *) {
+                if sample.value == HKCategoryValueSleepAnalysis.asleepREM.rawValue {
+                    metadata["Stage"] = "REM"
+                } else if sample.value == HKCategoryValueSleepAnalysis.asleepCore.rawValue {
+                    metadata["Stage"] = "Core"
+                } else if sample.value == HKCategoryValueSleepAnalysis.asleepDeep.rawValue {
+                    metadata["Stage"] = "Deep"
+                }
+            }
+            outPoints.append(AppleHealthDataPoint(
+                kind: .sleepSegment,
+                startDate: sample.startDate,
+                endDate: sample.endDate,
+                value: sample.endDate.timeIntervalSince(sample.startDate) / 3600,
+                unit: "hours",
+                sourceName: sample.sourceRevision.source.name,
+                metadata: metadata
+            ))
+        }
 
         let groupedByNight = Dictionary(grouping: asleepSamples) { sample in
             calendar.startOfDay(for: calendar.date(byAdding: .hour, value: -12, to: sample.startDate) ?? sample.startDate)
@@ -84,7 +107,7 @@ final class AppleHealthContextReader: ObservableObject {
         )
     }
 
-    private func fetchLatestAudiogramSummary() async throws -> AppleHearingSummary? {
+    private func fetchLatestAudiogramSummary(outPoints: inout [AppleHealthDataPoint]) async throws -> AppleHearingSummary? {
         let audiogramType = HKObjectType.audiogramSampleType()
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         let samples = try await audiogramSamples(type: audiogramType, sortDescriptors: [sort])
@@ -92,17 +115,31 @@ final class AppleHealthContextReader: ObservableObject {
 
         let leftValues = latest.sensitivityPoints.compactMap { point -> AudiogramValue? in
             guard let sensitivity = point.leftEarSensitivity?.doubleValue(for: .decibelHearingLevel()) else { return nil }
-            return AudiogramValue(
-                frequencyHz: point.frequency.doubleValue(for: .hertz()),
-                dbHL: sensitivity
-            )
+            let freq = point.frequency.doubleValue(for: .hertz())
+            outPoints.append(AppleHealthDataPoint(
+                kind: .audiogramLeft,
+                startDate: latest.startDate,
+                endDate: latest.endDate,
+                value: sensitivity,
+                unit: "dB HL",
+                sourceName: latest.sourceRevision.source.name,
+                metadata: ["Frequency": "\(freq) Hz"]
+            ))
+            return AudiogramValue(frequencyHz: freq, dbHL: sensitivity)
         }
         let rightValues = latest.sensitivityPoints.compactMap { point -> AudiogramValue? in
             guard let sensitivity = point.rightEarSensitivity?.doubleValue(for: .decibelHearingLevel()) else { return nil }
-            return AudiogramValue(
-                frequencyHz: point.frequency.doubleValue(for: .hertz()),
-                dbHL: sensitivity
-            )
+            let freq = point.frequency.doubleValue(for: .hertz())
+            outPoints.append(AppleHealthDataPoint(
+                kind: .audiogramRight,
+                startDate: latest.startDate,
+                endDate: latest.endDate,
+                value: sensitivity,
+                unit: "dB HL",
+                sourceName: latest.sourceRevision.source.name,
+                metadata: ["Frequency": "\(freq) Hz"]
+            ))
+            return AudiogramValue(frequencyHz: freq, dbHL: sensitivity)
         }
 
         return AppleHearingSummary(

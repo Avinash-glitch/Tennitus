@@ -533,7 +533,7 @@ private struct TargetSoundProfile {
     static func make(from description: String) -> TargetSoundProfile {
         let normalized = description.lowercased()
 
-        if normalized.contains("electric guitar") || normalized.contains("guitar") {
+        if normalized.contains("electric guitar") || normalized.contains("guitar") || normalized.contains("music") {
             return TargetSoundProfile(
                 label: "electric guitar-like sound",
                 energyRanges: [80...1_200, 1_500...5_000, 5_000...8_000],
@@ -559,7 +559,7 @@ private struct TargetSoundProfile {
             )
         }
 
-        if normalized.contains("cymbal") || normalized.contains("hiss") || normalized.contains("sharp") || normalized.contains("screech") {
+        if normalized.contains("cymbal") || normalized.contains("hiss") || normalized.contains("sharp") || normalized.contains("screech") || normalized.contains("squeal") {
             return TargetSoundProfile(
                 label: "sharp high-frequency sound",
                 energyRanges: [4_000...16_000],
@@ -572,7 +572,7 @@ private struct TargetSoundProfile {
             )
         }
 
-        if normalized.contains("bass") || normalized.contains("rumble") || normalized.contains("engine") {
+        if normalized.contains("bass") || normalized.contains("rumble") || normalized.contains("engine") || normalized.contains("fan") || normalized.contains("low hum") {
             return TargetSoundProfile(
                 label: "low-frequency sound",
                 energyRanges: [20...500],

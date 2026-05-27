@@ -64,26 +64,39 @@ struct ClinicalBottomNav: View {
                 Button {
                     selection = tab
                 } label: {
-                    VStack(spacing: 4) {
-                        Text(tab.rawValue)
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .foregroundStyle(selection == tab ? TennitusStyle.primary : TennitusStyle.muted)
+                    VStack(spacing: 6) {
                         Circle()
                             .fill(selection == tab ? TennitusStyle.accent : TennitusStyle.surface2)
-                            .frame(width: 4, height: 4)
+                            .frame(width: 6, height: 6)
+                            .shadow(color: selection == tab ? TennitusStyle.accent : .clear, radius: 4, x: 0, y: 0)
+                        
+                        Text(tab.rawValue)
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundStyle(selection == tab ? TennitusStyle.accent : TennitusStyle.muted)
                     }
                     .frame(maxWidth: .infinity)
+                    .frame(height: 56) // Made bigger
+                    .background(selection == tab ? Color.white.opacity(0.05) : Color.clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(GlassyTabButtonStyle())
             }
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, 8)
         .padding(.horizontal, 8)
-        .background(TennitusStyle.surfaceElevated.opacity(0.85), in: Capsule())
-        .overlay(Capsule().stroke(TennitusStyle.border, lineWidth: 1))
+        .background(TennitusStyle.surfaceElevated.opacity(0.85), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(TennitusStyle.border, lineWidth: 1))
         .shadow(color: Color.black.opacity(0.4), radius: 20, x: 0, y: 10)
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
+    }
+}
+
+private struct GlassyTabButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 

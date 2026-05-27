@@ -63,37 +63,64 @@ struct TodayView: View {
                         showingEventLogger = true
                     } label: {
                         GlassPanel(padding: 16) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Circle()
-                                    .fill(TennitusStyle.accent.opacity(0.12))
-                                    .frame(width: 40, height: 40)
-                                    .overlay(Image(systemName: "mic.fill").foregroundStyle(TennitusStyle.accent))
-                                Text("Log Event")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(TennitusStyle.graphite)
+                            VStack(alignment: .leading) {
+                                Text("LOG EVENT")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .tracking(1.5)
+                                    .foregroundStyle(TennitusStyle.muted)
+                                Spacer()
+                                HStack(alignment: .bottom) {
+                                    Circle()
+                                        .fill(TennitusStyle.accent)
+                                        .frame(width: 36, height: 36)
+                                        .shadow(color: TennitusStyle.accent, radius: 8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 3)
+                                                .fill(TennitusStyle.background)
+                                                .frame(width: 12, height: 12)
+                                        )
+                                    Spacer()
+                                    Text("→")
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundStyle(TennitusStyle.muted)
+                                }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(height: 80) // To match h-28 roughly (112pt) minus padding
                         }
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(GlassyCardButtonStyle())
 
                     Button {
                         showingLab = true
                     } label: {
                         GlassPanel(padding: 16) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Circle()
-                                    .fill(TennitusStyle.accent.opacity(0.12)) // Cyan matching the prompt's request for active/positive
-                                    .frame(width: 40, height: 40)
-                                    .overlay(Image(systemName: "waveform").foregroundStyle(TennitusStyle.accent))
-                                Text("Tone Match")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(TennitusStyle.graphite)
+                            VStack(alignment: .leading) {
+                                Text("TONE MATCH")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .tracking(1.5)
+                                    .foregroundStyle(TennitusStyle.muted)
+                                Spacer()
+                                HStack(alignment: .bottom) {
+                                    Circle()
+                                        .stroke(TennitusStyle.accent, lineWidth: 1)
+                                        .frame(width: 36, height: 36)
+                                        .overlay(
+                                            Text("Hz")
+                                                .font(.system(size: 10, design: .monospaced))
+                                                .foregroundStyle(TennitusStyle.accent)
+                                        )
+                                    Spacer()
+                                    Text("→")
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .foregroundStyle(TennitusStyle.muted)
+                                }
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(height: 80)
                         }
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(GlassyCardButtonStyle())
                 }
             }
 
@@ -519,5 +546,14 @@ private struct TinnitusSubtypeCard: View {
 
     private func formatHz(_ hz: Double) -> String {
         hz >= 1000 ? String(format: "%.1f kHz", hz / 1000.0) : "\(Int(hz)) Hz"
+    }
+}
+
+private struct GlassyCardButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .opacity(configuration.isPressed ? 0.8 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }

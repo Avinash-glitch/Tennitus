@@ -43,6 +43,7 @@ struct LabView: View {
     @State private var isAnalysingWithAI = false
     @State private var aiError: String?
     @State private var saveMessage: String?
+    @State private var toneDialSensitivity = 100.0
 
     private let labelOptions = ["Sharp", "Sibilant", "Pulsing", "Metallic", "Crowded", "Hissing"]
 
@@ -178,14 +179,33 @@ struct LabView: View {
                                 .frame(width: 12, height: 12)
                         }
 
-                        VStack(alignment: .center, spacing: 6) {
+                        HStack(spacing: 20) {
+                            Spacer()
+                            
                             RotaryDialControl(
                                 value: $tonePlayer.frequencyHz,
                                 bounds: matchLowHz...matchHighHz,
-                                step: 50.0,
+                                step: toneDialSensitivity,
                                 unit: "Hz",
                                 format: { val in "\(Int(val.rounded()))" }
                             )
+                            
+                            VStack(spacing: 8) {
+                                Text("Fast")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(TennitusStyle.muted)
+                                    
+                                Slider(value: $toneDialSensitivity, in: 1...199)
+                                    .rotationEffect(.degrees(-90))
+                                    .frame(width: 20, height: 160)
+                                
+                                Text("Fine")
+                                    .font(.system(size: 10, weight: .bold, design: .monospaced))
+                                    .foregroundStyle(TennitusStyle.muted)
+                            }
+                            .frame(width: 40)
+                            
+                            Spacer()
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)

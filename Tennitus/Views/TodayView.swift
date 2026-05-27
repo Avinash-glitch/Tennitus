@@ -60,6 +60,7 @@ struct TodayView: View {
             AppSection {
                 HStack(spacing: 12) {
                     Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         showingEventLogger = true
                     } label: {
                         GlassPanel(padding: 16) {
@@ -92,6 +93,7 @@ struct TodayView: View {
                     .buttonStyle(GlassyCardButtonStyle())
 
                     Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         showingLab = true
                     } label: {
                         GlassPanel(padding: 16) {
@@ -247,6 +249,7 @@ struct TodayView: View {
                                 }
 
                                 Button {
+                                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                     spikeDraft = SpikeLog()
                                     showingSpikeLog = true
                                 } label: {

@@ -88,6 +88,7 @@ struct ClinicalBottomNav: View {
         .shadow(color: Color.black.opacity(0.4), radius: 20, x: 0, y: 10)
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
+        .sensoryFeedback(.selection, trigger: selection)
     }
 }
 
@@ -228,17 +229,13 @@ struct RotaryDialControl: View {
                 }
             }
         }
+        .sensoryFeedback(.selection, trigger: value)
     }
 
     private func setValue(_ rawValue: Double) {
         let clamped = min(max(rawValue, bounds.lowerBound), bounds.upperBound)
         let stepped = bounds.lowerBound + ((clamped - bounds.lowerBound) / step).rounded() * step
-        let newValue = min(max(stepped, bounds.lowerBound), bounds.upperBound)
-        
-        if value != newValue {
-            value = newValue
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        }
+        value = min(max(stepped, bounds.lowerBound), bounds.upperBound)
     }
 
     private var rotationAngle: Double {

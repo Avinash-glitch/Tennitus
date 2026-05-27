@@ -185,6 +185,7 @@ struct EventLoggerView: View {
     private var saveButton: some View {
         VStack(spacing: 12) {
             Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 saveEvent()
             } label: {
                 Text("SAVE DATA ENTRY")

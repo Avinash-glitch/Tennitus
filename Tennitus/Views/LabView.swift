@@ -11,6 +11,7 @@ struct LabView: View {
     }
 
     @EnvironmentObject private var store: AppStore
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var tonePlayer = TinnitusTonePlayer()
     @StateObject private var recorder = AudioEventRecorder()
     @StateObject private var playbackPlayer = RecordingPlaybackPlayer()
@@ -153,6 +154,22 @@ struct LabView: View {
             AppSection {
                 SafetyNote(text: "Use the lab at comfortable volume only. The app helps track patterns and prepare reports, but it does not diagnose, treat, or cure tinnitus.")
             }
+            
+            Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                dismiss()
+            } label: {
+                Text("BACK TO HOME")
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .tracking(1.0)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(TennitusStyle.surfaceElevated, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(TennitusStyle.border, lineWidth: 1))
+                    .foregroundStyle(TennitusStyle.primary)
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 8)
         }
     }
 

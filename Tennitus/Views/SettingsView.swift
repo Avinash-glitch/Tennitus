@@ -13,171 +13,95 @@ struct SettingsView: View {
     var body: some View {
         AppScreen {
             AppHeader(
-                eyebrow: "SETTINGS",
+                eyebrow: "ACCOUNT · LOCAL-ONLY",
                 title: "Profile",
-                subtitle: "Keep the tinnitus profile, privacy settings, and AI connection explicit."
+                subtitle: "\(store.checkIns.count) check-ins · \(store.audioEvents.count) events"
             )
 
-            AppSection("Tinnitus profile") {
-                AppCard(padding: 16) {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Picker("Laterality", selection: $store.profile.laterality) {
-                            ForEach(TinnitusLaterality.allCases) { item in
-                                Text(item.rawValue).tag(item)
-                            }
+            AppSection {
+                GlassPanel(padding: 0) {
+                    VStack(spacing: 0) {
+                        NavigationLink {
+                            ProfileEditorView()
+                        } label: {
+                            SettingsRow(label: "Tinnitus Profile", value: savedToneSummary, muted: false)
                         }
-                        .pickerStyle(.menu)
+                        .buttonStyle(.plain)
 
-                        Picker("Sound type", selection: $store.profile.soundType) {
-                            ForEach(SoundType.allCases) { item in
-                                Text(item.rawValue).tag(item)
-                            }
-                        }
-                        .pickerStyle(.menu)
+                        Divider().background(TennitusStyle.border)
 
-                        TinnitusSoundReferencePicker(
-                            selectedType: $store.profile.soundType,
-                            playingType: referencePlayer.playingType,
-                            onPlay: { referencePlayer.toggle($0) }
-                        )
-
-                        Divider()
-
-                        HStack {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("Saved tone match")
-                                    .font(.subheadline.weight(.medium))
-                                    .foregroundStyle(TennitusStyle.graphite)
-                                Text(savedToneSummary)
-                                    .font(.caption)
-                                    .foregroundStyle(TennitusStyle.muted)
-                            }
-                            Spacer()
-                            Image(systemName: "waveform")
-                                .foregroundStyle(TennitusStyle.primary)
-                        }
-                    }
-                }
-            }
-
-            AppSection("Baseline") {
-                AppCard(padding: 16) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        SettingsScaleRow(title: "Loudness", value: $store.profile.baselineLoudness)
-                        SettingsScaleRow(title: "Distress", value: $store.profile.baselineDistress)
-                        SettingsScaleRow(title: "Sleep impact", value: $store.profile.sleepImpact)
-                    }
-                }
-            }
-            
-            AppSection("Clinical Safety") {
-                AppCard(padding: 16) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        if store.profile.redFlags?.hasRedFlags == true {
-                            Text("Medical review recommended")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.red)
-                        } else if store.profile.redFlags != nil {
-                            Text("No red flags reported")
-                                .font(.subheadline)
-                                .foregroundStyle(.green)
-                        } else {
-                            Text("Safety screening not completed")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        
                         NavigationLink {
                             RedFlagScreeningView()
                         } label: {
-                            Label("Update screening", systemImage: "stethoscope")
+                            SettingsRow(label: "Clinical Safety", value: safetyStatus, muted: false)
                         }
-                        .buttonStyle(AppButtonStyle(variant: .secondary))
-                    }
-                }
-            }
+                        .buttonStyle(.plain)
 
-
-
-            AppSection("Apple Health") {
-                AppCard(padding: 16) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Link sleep duration and Apple audiogram hearing-test samples as context for trends and AI summaries.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        Divider().background(TennitusStyle.border)
 
                         Button {
                             syncAppleHealthContext()
                         } label: {
-                            Label(isSyncingHealth ? "Syncing..." : "Sync sleep and hearing", systemImage: "heart.text.square")
+                            SettingsRow(label: "Apple Health", value: isSyncingHealth ? "Syncing..." : (store.appleHealthContext.sleep != nil ? "Connected" : "Tap to connect"), muted: false)
                         }
-                        .buttonStyle(AppButtonStyle(variant: .secondary))
-                        .disabled(isSyncingHealth)
-
-                        if let sleep = store.appleHealthContext.sleep {
-                            Text("Sleep: latest \(sleep.latestNightAsleepHours.formatted(.number.precision(.fractionLength(1))))h, \(sleep.lookbackDays)-day avg \(sleep.averageAsleepHours.formatted(.number.precision(.fractionLength(1))))h")
-                                .font(.caption)
-                                .foregroundStyle(TennitusStyle.muted)
-                        }
-
-                        if let hearing = store.appleHealthContext.hearing {
-                            Text("Hearing: latest audiogram \(hearingDateLabel(hearing.latestAudiogramDate)), L \(dbLabel(hearing.averageLeftDBHL)), R \(dbLabel(hearing.averageRightDBHL))")
-                                .font(.caption)
-                                .foregroundStyle(TennitusStyle.muted)
-                        }
+                        .buttonStyle(.plain)
 
                         if !store.appleHealthContext.dataPoints.isEmpty {
+                            Divider().background(TennitusStyle.border)
                             NavigationLink {
                                 AppleHealthHistoryView(dataPoints: store.appleHealthContext.dataPoints)
                             } label: {
-                                Label("View full history", systemImage: "list.bullet.rectangle")
+                                SettingsRow(label: "Audiogram & History", value: "\(store.appleHealthContext.dataPoints.count) records", muted: false)
                             }
-                            .buttonStyle(AppButtonStyle(variant: .secondary))
+                            .buttonStyle(.plain)
                         }
 
-                        if let healthMessage {
-                            Text(healthMessage)
-                                .font(.footnote)
-                                .foregroundStyle(TennitusStyle.muted)
-                        }
-                    }
-                }
-            }
-
-            AppSection("Privacy") {
-                AppCard(padding: 16) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Tennitus stores MVP data locally on this device. Cloud sync and AI are optional for the current build.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        Divider().background(TennitusStyle.border)
 
                         Button {
                             generatePortableExport()
                         } label: {
-                            Label("Export portable data", systemImage: "square.and.arrow.up")
+                            SettingsRow(label: "Export Data", value: "CSV · JSON", muted: true)
                         }
-                        .buttonStyle(AppButtonStyle(variant: .secondary))
+                        .buttonStyle(.plain)
 
                         if let portableExportURL {
+                            Divider().background(TennitusStyle.border)
                             ShareLink(item: portableExportURL) {
-                                Label("Share export file", systemImage: "doc.badge.arrow.up")
+                                SettingsRow(label: "Share Export", value: "Ready", muted: false)
                             }
-                            .buttonStyle(AppButtonStyle(variant: .secondary))
+                            .buttonStyle(.plain)
                         }
 
-                        if let exportMessage {
-                            Text(exportMessage)
-                                .font(.footnote)
-                                .foregroundStyle(TennitusStyle.muted)
-                        }
+                        Divider().background(TennitusStyle.border)
 
-                        Button(role: .destructive) {
+                        Button {
                             showingDeleteConfirmation = true
                         } label: {
-                            Label("Delete local data", systemImage: "trash")
+                            SettingsRow(label: "Delete Data", value: "Local only", muted: true)
                         }
-                        .buttonStyle(AppButtonStyle(variant: .danger))
+                        .buttonStyle(.plain)
+
+                        Divider().background(TennitusStyle.border)
+
+                        SettingsRow(label: "About Tennitus", value: "v4.2.1", muted: true)
                     }
+                }
+            }
+
+            if let exportMessage {
+                AppSection {
+                    Text(exportMessage)
+                        .font(.footnote)
+                        .foregroundStyle(TennitusStyle.muted)
+                }
+            }
+
+            if let healthMessage {
+                AppSection {
+                    Text(healthMessage)
+                        .font(.footnote)
+                        .foregroundStyle(TennitusStyle.muted)
                 }
             }
         }
@@ -197,13 +121,16 @@ struct SettingsView: View {
 
     private var savedToneSummary: String {
         guard let frequency = store.profile.savedToneFrequencyHz else {
-            return "No saved match yet"
+            return "No match"
         }
+        return formatHz(frequency)
+    }
 
-        let waveform = store.profile.savedToneWaveform?.rawValue ?? ToneWaveform.sine.rawValue
-        let low = store.profile.toneMatchLowHz ?? 125
-        let high = store.profile.toneMatchHighHz ?? 12_000
-        return "\(formatHz(frequency)) · \(waveform) · \(formatHz(low))-\(formatHz(high))"
+    private var safetyStatus: String {
+        guard let redFlags = store.profile.redFlags else {
+            return "Not completed"
+        }
+        return redFlags.hasRedFlags ? "Review needed" : "Completed"
     }
 
     private func formatHz(_ hz: Double) -> String {
@@ -249,6 +176,26 @@ struct SettingsView: View {
     private func dbLabel(_ value: Double?) -> String {
         guard let value else { return "-- dB HL" }
         return "\(value.formatted(.number.precision(.fractionLength(0)))) dB HL"
+    }
+}
+
+private struct SettingsRow: View {
+    var label: String
+    var value: String
+    var muted: Bool
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(TennitusStyle.graphite)
+            Spacer()
+            Text(value)
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(muted ? TennitusStyle.muted : TennitusStyle.primary)
+        }
+        .padding(16)
+        .contentShape(Rectangle())
     }
 }
 
@@ -400,7 +347,7 @@ struct ProfileEditorView: View {
     var body: some View {
         AppScreen {
             AppSection("Tinnitus profile") {
-                AppCard(padding: 16) {
+                GlassPanel(padding: 16) {
                     VStack(alignment: .leading, spacing: 14) {
                         Picker("Laterality", selection: $store.profile.laterality) {
                             ForEach(TinnitusLaterality.allCases) { item in
@@ -422,7 +369,7 @@ struct ProfileEditorView: View {
                             onPlay: { referencePlayer.toggle($0) }
                         )
 
-                        Divider()
+                        Divider().background(TennitusStyle.border)
 
                         HStack {
                             VStack(alignment: .leading, spacing: 3) {
@@ -442,7 +389,7 @@ struct ProfileEditorView: View {
             }
 
             AppSection("Baseline") {
-                AppCard(padding: 16) {
+                GlassPanel(padding: 16) {
                     VStack(alignment: .leading, spacing: 16) {
                         SettingsScaleRow(title: "Loudness", value: $store.profile.baselineLoudness)
                         SettingsScaleRow(title: "Distress", value: $store.profile.baselineDistress)

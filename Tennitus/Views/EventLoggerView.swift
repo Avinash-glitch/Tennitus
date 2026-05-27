@@ -145,8 +145,7 @@ struct EventLoggerView: View {
                 title: "How distressing is it right now?",
                 subtitle: "This captures the emotional load of the event.",
                 value: $distress,
-                lowLabel: "Calm",
-                highLabel: "Severe"
+                unit: "/ 10"
             )
         case .loudness:
             scaleStep(
@@ -154,8 +153,7 @@ struct EventLoggerView: View {
                 title: "How loud does it feel?",
                 subtitle: "This is your perceived tinnitus loudness, not microphone loudness.",
                 value: $loudness,
-                lowLabel: "Barely there",
-                highLabel: "Very loud"
+                unit: "/ 10"
             )
         case .context:
             contextStep
@@ -169,8 +167,7 @@ struct EventLoggerView: View {
         title: String,
         subtitle: String,
         value: Binding<Double>,
-        lowLabel: String,
-        highLabel: String
+        unit: String
     ) -> some View {
         EventStepContainer(eyebrow: eyebrow, title: title, subtitle: subtitle) {
             VStack(spacing: 28) {
@@ -180,21 +177,15 @@ struct EventLoggerView: View {
                     }
                 }
 
-                Text("\(Int(value.wrappedValue.rounded()))")
-                    .font(.system(size: 88, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(EventTheme.primary)
-
-                Slider(value: value, in: 0...10, step: 1)
-                    .tint(EventTheme.primary)
-
-                HStack {
-                    Text(lowLabel)
-                    Spacer()
-                    Text(highLabel)
-                }
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(EventTheme.muted)
+                RotaryDialControl(
+                    value: value,
+                    bounds: 0...10,
+                    step: 1.0,
+                    unit: unit,
+                    format: { val in "\(Int(val.rounded()))" }
+                )
+                .frame(maxWidth: .infinity)
+                .padding(.top, 40)
             }
         }
     }
@@ -709,15 +700,15 @@ struct EventLoggerView: View {
 }
 
 private enum EventTheme {
-    static let background = Color(red: 0.035, green: 0.047, blue: 0.061)
-    static let surface = Color(red: 0.086, green: 0.108, blue: 0.130)
-    static let surface2 = Color(red: 0.118, green: 0.145, blue: 0.168)
-    static let primary = Color(red: 0.388, green: 0.875, blue: 0.769)
-    static let accent = Color(red: 0.949, green: 0.611, blue: 0.235)
-    static let warning = Color(red: 1.000, green: 0.384, blue: 0.322)
-    static let text = Color(red: 0.937, green: 0.957, blue: 0.953)
-    static let muted = Color(red: 0.620, green: 0.674, blue: 0.704)
-    static let border = Color.white.opacity(0.12)
+    static let background = TennitusStyle.background
+    static let surface = TennitusStyle.surface
+    static let surface2 = TennitusStyle.surface2
+    static let primary = TennitusStyle.accent
+    static let accent = TennitusStyle.warning
+    static let warning = TennitusStyle.destructive
+    static let text = TennitusStyle.graphite
+    static let muted = TennitusStyle.muted
+    static let border = TennitusStyle.border
 }
 
 private struct EventStepContainer<Content: View>: View {
@@ -757,12 +748,15 @@ private struct EventPill: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.caption.weight(.semibold))
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
                 .frame(maxWidth: .infinity)
                 .frame(height: 34)
                 .background(active ? EventTheme.primary : EventTheme.surface2, in: Capsule())
-                .foregroundStyle(active ? EventTheme.background : EventTheme.text)
+                .foregroundStyle(active ? .black : EventTheme.text)
+                .overlay(
+                    Capsule().stroke(active ? EventTheme.primary : EventTheme.border, lineWidth: 1)
+                )
         }
         .buttonStyle(.plain)
     }
@@ -835,9 +829,9 @@ private struct ActiveRecordingStrip: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Recording continues")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(EventTheme.text)
+                Text("REC ACTIVE")
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .foregroundStyle(EventTheme.warning)
                 Text("\(elapsedSeconds)s · \(loudnessDBFS.formatted(.number.precision(.fractionLength(0)))) dBFS")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(EventTheme.muted)
@@ -859,7 +853,7 @@ private struct ActiveRecordingStrip: View {
         .background(EventTheme.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(EventTheme.primary.opacity(0.28), lineWidth: 1)
+                .stroke(EventTheme.border, lineWidth: 1)
         )
     }
 }

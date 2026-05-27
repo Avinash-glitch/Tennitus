@@ -1,15 +1,17 @@
 import SwiftUI
 
 enum TennitusStyle {
-    static let background = Color(red: 0.969, green: 0.980, blue: 0.976)
-    static let surface = Color.white
-    static let surface2 = Color(red: 0.957, green: 0.965, blue: 0.969)
-    static let primary = Color(red: 0.059, green: 0.463, blue: 0.431)
-    static let accent = Color(red: 0.851, green: 0.467, blue: 0.024)
-    static let warning = Color(red: 0.780, green: 0.180, blue: 0.120)
-    static let graphite = Color(red: 0.125, green: 0.161, blue: 0.216)
-    static let muted = Color(red: 0.420, green: 0.447, blue: 0.502)
-    static let border = Color(red: 0.839, green: 0.871, blue: 0.890)
+    static let background = Color(red: 0.075, green: 0.078, blue: 0.090)
+    static let surface = Color.white.opacity(0.035)
+    static let surface2 = Color.white.opacity(0.075)
+    static let surfaceElevated = Color(red: 0.145, green: 0.149, blue: 0.168)
+    static let primary = Color(red: 0.980, green: 0.984, blue: 0.992)
+    static let accent = Color(red: 0.400, green: 0.890, blue: 0.890)
+    static let warning = Color(red: 0.950, green: 0.670, blue: 0.250)
+    static let destructive = Color(red: 0.920, green: 0.250, blue: 0.190)
+    static let graphite = Color(red: 0.970, green: 0.975, blue: 0.985)
+    static let muted = Color(red: 0.560, green: 0.585, blue: 0.630)
+    static let border = Color.white.opacity(0.08)
 }
 
 struct AppScreen<Content: View>: View {
@@ -22,9 +24,17 @@ struct AppScreen<Content: View>: View {
             }
             .padding(.vertical, 12)
         }
-        .background(TennitusStyle.background.ignoresSafeArea())
+        .background(
+            ZStack {
+                TennitusStyle.background.ignoresSafeArea()
+                RadialGradient(gradient: Gradient(colors: [TennitusStyle.accent.opacity(0.12), .clear]), center: .topTrailing, startRadius: 0, endRadius: 400)
+                    .ignoresSafeArea()
+                RadialGradient(gradient: Gradient(colors: [TennitusStyle.warning.opacity(0.08), .clear]), center: .bottomLeading, startRadius: 0, endRadius: 400)
+                    .ignoresSafeArea()
+            }
+        )
         .foregroundStyle(TennitusStyle.graphite)
-        .preferredColorScheme(.light)
+        .preferredColorScheme(.dark)
         .scrollIndicators(.hidden)
     }
 }
@@ -37,12 +47,13 @@ struct AppHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let eyebrow {
-                Text(eyebrow)
-                    .font(.system(size: 13, weight: .medium, design: .default))
-                    .foregroundStyle(TennitusStyle.muted)
+                Text(eyebrow.uppercased())
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .tracking(1.2)
+                    .foregroundStyle(TennitusStyle.accent)
             }
             Text(title)
-                .font(.system(size: 28, weight: .bold, design: .default))
+                .font(.system(size: 30, weight: .bold, design: .default))
                 .foregroundStyle(TennitusStyle.graphite)
             if let subtitle {
                 Text(subtitle)
@@ -96,9 +107,13 @@ struct AppCard<Content: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(padding)
-        .background(TennitusStyle.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(TennitusStyle.surface, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
         .foregroundStyle(TennitusStyle.graphite)
-        .shadow(color: Color(red: 0.059, green: 0.118, blue: 0.157).opacity(0.12), radius: 24, x: 0, y: 8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(TennitusStyle.border, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 12, x: 0, y: 4)
     }
 }
 
@@ -123,11 +138,11 @@ struct PillButton: View {
                 .font(.footnote.weight(.medium))
                 .padding(.horizontal, 12)
                 .frame(height: 32)
-                .background(active ? TennitusStyle.primary : TennitusStyle.surface)
-                .foregroundStyle(active ? .white : TennitusStyle.graphite)
+                .background(active ? TennitusStyle.accent : TennitusStyle.surface)
+                .foregroundStyle(active ? .black : TennitusStyle.graphite)
                 .overlay(
                     Capsule()
-                        .stroke(active ? TennitusStyle.primary : TennitusStyle.border, lineWidth: 1)
+                        .stroke(active ? TennitusStyle.accent : TennitusStyle.border, lineWidth: 1)
                 )
                 .clipShape(Capsule())
         }
@@ -152,30 +167,29 @@ struct AppButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .frame(minHeight: 44)
             .padding(.horizontal, 12)
-            .background(background.opacity(configuration.isPressed ? 0.82 : 1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(background.opacity(configuration.isPressed ? 0.82 : 1), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             .foregroundStyle(foreground)
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(border, lineWidth: variant == .secondary ? 1 : 0)
             )
-            // Removed .contentShape(Rectangle()) to prevent accidental full-width edge taps
     }
 
     private var background: Color {
         switch variant {
-        case .primary: TennitusStyle.primary
+        case .primary, .accent: TennitusStyle.accent
         case .secondary: TennitusStyle.surface
-        case .accent: TennitusStyle.accent
-        case .danger: TennitusStyle.warning
+        case .danger: TennitusStyle.destructive
         case .ghost: Color.clear
         }
     }
 
     private var foreground: Color {
         switch variant {
-        case .primary, .accent, .danger: .white
+        case .primary, .accent: .black
+        case .danger: .white
         case .secondary: TennitusStyle.graphite
-        case .ghost: TennitusStyle.primary
+        case .ghost: TennitusStyle.accent
         }
     }
 
@@ -211,7 +225,7 @@ struct StatBlock: View {
 }
 
 struct MiniWaveView: View {
-    var color = TennitusStyle.primary
+    var color = TennitusStyle.accent
 
     var body: some View {
         HStack(alignment: .center, spacing: 2) {
@@ -238,10 +252,10 @@ struct SafetyNote: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(14)
-        .background(TennitusStyle.warning.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(TennitusStyle.warning.opacity(0.12), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(TennitusStyle.warning.opacity(0.22), lineWidth: 1)
+                .stroke(TennitusStyle.warning.opacity(0.3), lineWidth: 1)
         )
     }
 }
@@ -260,7 +274,7 @@ struct BackHeader: View {
             } label: {
                 Label(parent, systemImage: "chevron.left")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(TennitusStyle.primary)
+                    .foregroundStyle(TennitusStyle.accent)
             }
             .buttonStyle(.plain)
             Spacer()
@@ -270,7 +284,7 @@ struct BackHeader: View {
             if let actionTitle, let onAction {
                 Button(actionTitle, action: onAction)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(TennitusStyle.primary)
+                    .foregroundStyle(TennitusStyle.accent)
                     .buttonStyle(.plain)
             } else {
                 Text("")

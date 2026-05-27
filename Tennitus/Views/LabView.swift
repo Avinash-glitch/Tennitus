@@ -169,39 +169,38 @@ struct LabView: View {
                 AppCard(padding: 18) {
                     VStack(alignment: .leading, spacing: 18) {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            Text("\(Int(tonePlayer.frequencyHz))")
-                                .font(.system(size: 48, weight: .bold, design: .rounded))
-                                .monospacedDigit()
+                            Text("Tinnitus Tone")
+                                .font(.headline)
                                 .foregroundStyle(TennitusStyle.graphite)
-                            Text("Hz")
-                                .font(.title3.weight(.semibold))
-                                .foregroundStyle(.secondary)
                             Spacer()
                             Circle()
-                                .fill(tonePlayer.isPlaying ? TennitusStyle.primary : TennitusStyle.border)
+                                .fill(tonePlayer.isPlaying ? TennitusStyle.accent : TennitusStyle.border)
                                 .frame(width: 12, height: 12)
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text("Frequency")
-                                Spacer()
-                                Text("\(formatHz(matchLowHz)) to \(formatHz(matchHighHz))")
-                                    .foregroundStyle(.secondary)
-                            }
-                            .font(.subheadline)
-                            Slider(value: toneSliderBinding, in: 0...1)
+                        VStack(alignment: .center, spacing: 6) {
+                            RotaryDialControl(
+                                value: $tonePlayer.frequencyHz,
+                                bounds: matchLowHz...matchHighHz,
+                                step: 50.0,
+                                unit: "Hz",
+                                format: { val in "\(Int(val.rounded()))" }
+                            )
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
 
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Waveform")
                                 .font(.subheadline.weight(.medium))
-                            Picker("Waveform", selection: $tonePlayer.waveform) {
+
+                            HStack(spacing: 8) {
                                 ForEach(ToneWaveform.allCases) { waveform in
-                                    Text(waveform.rawValue).tag(waveform)
+                                    PillButton(title: waveform.rawValue, active: tonePlayer.waveform == waveform) {
+                                        tonePlayer.waveform = waveform
+                                    }
                                 }
                             }
-                            .pickerStyle(.segmented)
                         }
 
                         VStack(alignment: .leading, spacing: 10) {
@@ -585,8 +584,8 @@ struct LabView: View {
                                             .font(.caption.monospacedDigit())
                                             .foregroundStyle(TennitusStyle.muted)
                                     }
-
                                     Slider(value: spectrumSnapshotIndexBinding, in: 0...Double(max(0, spectrumSnapshots.count - 1)), step: 1)
+                                        .accentColor(TennitusStyle.accent)
                                 }
                             }
 
@@ -631,6 +630,7 @@ struct LabView: View {
                                 }
                                 .font(.subheadline)
                                 Slider(value: $notchHz, in: 125...12_000, step: 25)
+                                    .accentColor(TennitusStyle.accent)
                             }
 
                             Button {

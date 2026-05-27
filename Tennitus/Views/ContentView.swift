@@ -1,44 +1,45 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab: AppTab = .today
+
+    init() {
+        UITabBar.appearance().isHidden = true
+    }
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             NavigationStack {
                 TodayView()
             }
-            .tabItem {
-                Label("Today", systemImage: "checkmark.circle")
-            }
+            .tag(AppTab.today)
 
             NavigationStack {
                 TrendsView()
             }
-            .tabItem {
-                Label("Trends", systemImage: "chart.line.uptrend.xyaxis")
-            }
+            .tag(AppTab.trends)
 
             NavigationStack {
                 SoundsView()
             }
-            .tabItem {
-                Label("Sounds", systemImage: "waveform")
-            }
+            .tag(AppTab.sounds)
 
             NavigationStack {
                 ReportsView()
             }
-            .tabItem {
-                Label("Reports", systemImage: "doc.text")
-            }
+            .tag(AppTab.reports)
 
             NavigationStack {
                 SettingsView()
             }
-            .tabItem {
-                Label("Settings", systemImage: "gearshape")
-            }
+            .tag(AppTab.profile)
         }
-        .tint(TennitusStyle.primary)
-        .preferredColorScheme(.light)
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 82)
+        }
+        .overlay(alignment: .bottom) {
+            ClinicalBottomNav(selection: $selectedTab)
+        }
+        .preferredColorScheme(.dark)
     }
 }

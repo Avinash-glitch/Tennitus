@@ -46,6 +46,7 @@
 		100000000000000000000027 /* BackendComfortSessionAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000129 /* BackendComfortSessionAdvisor.swift */; };
 		100000000000000000000028 /* TinnitusReferenceSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000012A /* TinnitusReferenceSoundPlayer.swift */; };
 		100000000000000000000029 /* AppleHealthHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000012B /* AppleHealthHistoryView.swift */; };
+		10000000000000000000002A /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10000000000000000000012C /* Components.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,6 +91,7 @@
 		100000000000000000000129 /* BackendComfortSessionAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendComfortSessionAdvisor.swift; sourceTree = "<group>"; };
 		10000000000000000000012A /* TinnitusReferenceSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinnitusReferenceSoundPlayer.swift; sourceTree = "<group>"; };
 		10000000000000000000012B /* AppleHealthHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleHealthHistoryView.swift; sourceTree = "<group>"; };
+		10000000000000000000012C /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 				100000000000000000000114 /* LabView.swift */,
 				10000000000000000000011A /* AudiogramView.swift */,
 				10000000000000000000012B /* AppleHealthHistoryView.swift */,
+				10000000000000000000012C /* Components.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -313,6 +316,7 @@
 				100000000000000000000027 /* BackendComfortSessionAdvisor.swift in Sources */,
 				100000000000000000000028 /* TinnitusReferenceSoundPlayer.swift in Sources */,
 				100000000000000000000029 /* AppleHealthHistoryView.swift in Sources */,
+				10000000000000000000002A /* Components.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -44,7 +44,15 @@ struct LabView: View {
     @State private var isAnalysingWithAI = false
     @State private var aiError: String?
     @State private var saveMessage: String?
-    @State private var toneDialSensitivity = 100.0
+    @State private var sensitivitySliderValue = 0.5
+    
+    private var toneDialSensitivity: Double {
+        if sensitivitySliderValue <= 0.5 {
+            return 1 + (sensitivitySliderValue / 0.5) * 99.0
+        } else {
+            return 100 + ((sensitivitySliderValue - 0.5) / 0.5) * 400.0
+        }
+    }
 
     private let labelOptions = ["Sharp", "Sibilant", "Pulsing", "Metallic", "Crowded", "Hissing"]
 
@@ -212,7 +220,7 @@ struct LabView: View {
                                     .font(.system(size: 10, weight: .bold, design: .monospaced))
                                     .foregroundStyle(TennitusStyle.muted)
                                     
-                                Slider(value: sensitivityBinding, in: 0...1)
+                                Slider(value: $sensitivitySliderValue, in: 0...1)
                                     .rotationEffect(.degrees(-90))
                                     .frame(width: 20, height: 160)
                                 
@@ -810,22 +818,6 @@ struct LabView: View {
                 }), in: 0...max(0.25, recordingDurationSeconds), step: 0.1)
             }
         }
-    }
-
-    private var sensitivityBinding: Binding<Double> {
-        Binding(get: {
-            if toneDialSensitivity <= 100 {
-                return (toneDialSensitivity - 1) / 99.0 * 0.5
-            } else {
-                return 0.5 + (toneDialSensitivity - 100) / 400.0 * 0.5
-            }
-        }, set: { val in
-            if val <= 0.5 {
-                toneDialSensitivity = 1 + (val / 0.5) * 99.0
-            } else {
-                toneDialSensitivity = 100 + ((val - 0.5) / 0.5) * 400.0
-            }
-        })
     }
 
     private var toneSliderBinding: Binding<Double> {
